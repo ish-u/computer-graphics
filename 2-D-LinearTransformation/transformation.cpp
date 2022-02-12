@@ -13,8 +13,8 @@ int main()
     line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
 
     // Polygon
-    Shape *shape = new Shape(3);
-    shape->drawShape(shape->coOrdinates);
+    Shape *shape = new Shape();
+    shape->drawShape((shape->coOrdinates));
 
     // Menu
     int flag = 1;
