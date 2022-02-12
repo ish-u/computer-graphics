@@ -21,12 +21,13 @@ int main()
     int option = 0;
     do
     {
+        setcolor(12);
         cout << "Choose Option\n"
              << "1. Scaling\n"
              << "2. Shearing\n"
              << "3. Reflection\n"
              << "4. Rotation\n"
-             << "5. Translationn\n"
+             << "5. Translation\n"
              << "6. Transformation Matrix\n"
              << "7. Exit\n"
              << " : ";
@@ -59,11 +60,25 @@ int main()
             cout << " INVALID\n";
             break;
         }
-        // system("cls");
-
+        system("cls");
+        setcolor(15);
     } while (flag);
-
     closegraph();
-    system("pause");
+
+    delete shape;
+    // I think not all Matrices Objects created using 'new' are deleted
+    cout << "Deleting Temporary Matrices : "
+         << Matrix::tempMatrices.size() << "\n";
+    for (auto i = Matrix::tempMatrices.begin(); i != Matrix::tempMatrices.end(); i++)
+    {
+        try
+        {
+            delete (*i);
+        }
+        catch (exception &e)
+        {
+            cout << "ERROR : \t " << e.what() << "\n";
+        }
+    }
     return 0;
 }
