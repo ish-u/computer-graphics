@@ -3,14 +3,19 @@
 #include <graphics.h>
 #include <vector>
 using namespace std;
+
+// Matrix Class
 class Matrix
 {
 
 public:
+    // Data Members
     int r;
     int c;
     float **m;
+    // Static Variables
     static vector<Matrix *> tempMatrices;
+    // Constructor
     Matrix(int r, int c, int identity = 1)
     {
         this->r = r;
@@ -42,73 +47,106 @@ public:
             }
         }
     }
+    // Copy Constructor
+    Matrix(const Matrix &matrix)
+    {
+        r = matrix.r;
+        c = matrix.c;
+        m = new float *[r];
+        for (int i = 0; i < r; i++)
+        {
+            m[i] = new float[c];
+        }
+        for (int i = 0; i < r; i++)
+        {
+            for (int j = 0; j < c; j++)
+            {
+
+                m[i][j] = matrix.m[i][j];
+            }
+        }
+    }
+    // Destructor
     ~Matrix()
     {
-        cout << "DELETED : " << this << "\n";
         try
         {
             for (int i = 0; i < r; i++)
             {
                 delete[] m[i];
+                m[i] = NULL;
             }
             delete m;
+            m = NULL;
         }
         catch (exception &e)
         {
             cout << "ERROR : \t " << e.what() << "\n";
         }
     }
-    void print()
-    {
-        cout << "\n";
-        for (int i = 0; i < r; i++)
-        {
-            for (int j = 0; j < c; j++)
-            {
-                cout << m[i][j] << "\t";
-            }
-            cout << "\n";
-        }
-        cout << "\n";
-    }
-    Matrix operator*(Matrix &B)
-    {
-        if (this->c != B.r)
-        {
-            cout << "BAD";
-            return *(new Matrix(0, 0));
-        }
-        Matrix *C = new Matrix(this->r, B.c, 0);
-        for (int i = 0; i < this->r; i++)
-        {
-            for (int j = 0; j < B.c; j++)
-            {
-                for (int k = 0; k < this->c; k++)
-                {
-                    C->m[i][j] += (this->m[i][k] * B.m[k][j]);
-                }
-            }
-        }
-        Matrix::tempMatrices.push_back(C);
-        return *C;
-    }
-    Matrix transpose()
-    {
-        Matrix T(this->c, this->r);
-        for (int i = 0; i < this->r; i++)
-        {
-            for (int j = 0; j < this->c; j++)
-            {
-                T.m[i][j] = this->m[j][i];
-            }
-        }
-        return T;
-    }
+    // Member Functions
+    void display();
+    Matrix operator*(Matrix &B);
+    Matrix transpose();
 };
 
+// Initialzing the Static Varibale to store Pointers to Temporary Matrices
 vector<Matrix *> Matrix::tempMatrices = {};
 
-// transformation matrices
+// To Display the Matrix
+void Matrix ::display()
+{
+    cout << "\n";
+    for (int i = 0; i < r; i++)
+    {
+        for (int j = 0; j < c; j++)
+        {
+            cout << m[i][j] << "\t";
+        }
+        cout << "\n";
+    }
+}
+
+// To Multiply Two Matrix Objects A*bB
+Matrix Matrix::operator*(Matrix &B)
+{
+    if (this->c != B.r)
+    {
+        cout << "BAD";
+        return *(new Matrix(0, 0));
+    }
+    Matrix *C = new Matrix(this->r, B.c, 0);
+    for (int i = 0; i < this->r; i++)
+    {
+        for (int j = 0; j < B.c; j++)
+        {
+            for (int k = 0; k < this->c; k++)
+            {
+                C->m[i][j] += (this->m[i][k] * B.m[k][j]);
+            }
+        }
+    }
+    // Saving the pointer to the Craeted Matrix Object
+    Matrix::tempMatrices.push_back(C);
+    // cout << C << "\n";
+    return *C;
+}
+
+// To Find the Transpose of the Matrix
+Matrix Matrix ::transpose()
+{
+    Matrix T(this->c, this->r);
+    for (int i = 0; i < this->r; i++)
+    {
+        for (int j = 0; j < this->c; j++)
+        {
+            T.m[i][j] = this->m[j][i];
+        }
+    }
+    return T;
+}
+
+// TRANSFORMATION MATRICES
 // SCALE MATRIX
 Matrix getScaleMatrix(float scaleFacorX, float scaleFacorY)
 {
@@ -124,10 +162,10 @@ Matrix getShearingMatrix(float shearingFactorX, float shearingFactorY)
     Matrix shearingMatrix(3, 3);
     shearingMatrix.m[1][0] = shearingFactorX;
     shearingMatrix.m[0][1] = shearingFactorY;
-    shearingMatrix.print();
+    shearingMatrix.display();
     return shearingMatrix;
 }
-// REFLECTION MATRIX
+// REFLECTION MATRICES
 Matrix getReflectionMatrixAboutX()
 {
     Matrix reflectionMatrix(3, 3);
@@ -147,6 +185,7 @@ Matrix getReflectionMatrixAboutXY()
     Matrix reflectionMatrix(3, 3, 0);
     reflectionMatrix.m[0][1] = 1;
     reflectionMatrix.m[1][0] = 1;
+    reflectionMatrix.m[2][2] = 1;
     return reflectionMatrix;
 }
 Matrix getReflectionMatrixAboutX_Y()
@@ -154,6 +193,7 @@ Matrix getReflectionMatrixAboutX_Y()
     Matrix reflectionMatrix(3, 3, 0);
     reflectionMatrix.m[0][1] = -1;
     reflectionMatrix.m[1][0] = -1;
+    reflectionMatrix.m[2][2] = 1;
     return reflectionMatrix;
 }
 Matrix getReflectionMatrixAboutOrigin()
@@ -161,9 +201,10 @@ Matrix getReflectionMatrixAboutOrigin()
     Matrix reflectionMatrix(3, 3);
     reflectionMatrix.m[0][0] = -1;
     reflectionMatrix.m[1][1] = -1;
+    reflectionMatrix.m[2][2] = 1;
     return reflectionMatrix;
 }
-// ROTATION MATRIX
+// ROTATION MATRICES
 Matrix getRotationMatrixCounterClockwise(float theta)
 {
     Matrix rotationMatrix(3, 3);
@@ -185,7 +226,7 @@ Matrix getRotationMatrixClockwise(float theta)
 
     return rotationMatrix;
 }
-// TRANSLATION MATRIX
+// TRANSLATION MATRICES
 Matrix getTranslationMatrix(float xFactor, float yFactor)
 {
     Matrix translationMatrix(3, 3);
@@ -194,33 +235,36 @@ Matrix getTranslationMatrix(float xFactor, float yFactor)
     return translationMatrix;
 }
 
+// Shape Class
 class Shape
 {
 
 public:
+    // Data Memebers
     Matrix *coOrdinates;
     int numberOfCoOrdinates = 0;
-    // constructor
+    // Constructor
     Shape()
     {
         this->numberOfCoOrdinates = 4;
         this->coOrdinates = new Matrix(4, 3);
         this->coOrdinates->m[0][0] = 50;
         this->coOrdinates->m[0][1] = 50;
-        this->coOrdinates->m[1][0] = 150;
-        this->coOrdinates->m[1][1] = 75;
-        this->coOrdinates->m[2][0] = 175;
+        this->coOrdinates->m[1][0] = 50;
+        this->coOrdinates->m[1][1] = 135;
+        this->coOrdinates->m[2][0] = 170;
         this->coOrdinates->m[2][1] = 150;
-        this->coOrdinates->m[3][0] = 50;
-        this->coOrdinates->m[3][1] = 150;
+        this->coOrdinates->m[3][0] = 150;
+        this->coOrdinates->m[3][1] = 70;
 
         // filling last row as 1 for Homogenous Co-Ordinates
         for (int i = 0; i < numberOfCoOrdinates; i++)
         {
             this->coOrdinates->m[i][2] = 1;
         }
-        this->coOrdinates->print();
+        // this->coOrdinates->display();
     }
+    // Overloaded Constructor - to use when want to take input of Co-Ordinates
     Shape(int numberOfCoOrdinates)
     {
         this->numberOfCoOrdinates = numberOfCoOrdinates;
@@ -228,7 +272,7 @@ public:
         // taking Co-Ordinate Input
         for (int i = 0; i < numberOfCoOrdinates; i++)
         {
-            cout << "Co-Ordinate - " << i + 1 << " ->\t";
+            cout << "Co-Ordinate - " << i + 1 << " -> ";
             for (int j = 0; j < 2; j++)
             {
                 cin >> this->coOrdinates->m[i][j];
@@ -239,10 +283,10 @@ public:
         {
             this->coOrdinates->m[i][2] = 1;
         }
-        this->coOrdinates->print();
+        // this->coOrdinates->display();
     }
 
-    // desctructor
+    // Desctructor
     ~Shape()
     {
         delete this->coOrdinates;
@@ -257,10 +301,18 @@ public:
     void transformationMatrix();
 };
 
+// To Draw the Polygon whose Co-Ordinate are passes as in Homogenous Matrix as a "matrix" object
 void Shape::drawShape(Matrix *matrix)
 {
     float **coOrdinates = matrix->m;
     int numberOfCoOrdinates = matrix->r;
+
+    cout << "\nDRAWN FIGURE HOMOGENOUS CO_ORDINATES\n";
+    cout << "===================================";
+    matrix->display();
+    cout << "===================================\n\n";
+
+    // creating the poly array that will be the input to the "drawpoly()" function of the winbgim library
     int *poly = new int[(numberOfCoOrdinates + 1) * 2];
     int k = 0;
     for (int i = 0; i < numberOfCoOrdinates; i++)
@@ -280,10 +332,12 @@ void Shape::drawShape(Matrix *matrix)
         poly[i] += (((i + 1) % 2 != 0) ? getmaxx() / 2 : getmaxy() / 2);
         // cout << poly[i] << "\t";
     }
+    // drawing the polygon
     drawpoly(numberOfCoOrdinates + 1, poly);
     delete[] poly;
 }
 
+// To show Scaling Demonstration
 void Shape::scaling()
 {
     cout << "SCALING\n"
@@ -315,14 +369,16 @@ void Shape::scaling()
     {
         cout << "INVALID\n";
     }
-    break;
+        return;
     }
     Matrix scaleMatrix = getScaleMatrix(scaleFactorX, scaleFactorY);
     Matrix requiredMatrix = (*(this->coOrdinates)) * (scaleMatrix);
     Matrix *requiredMatrixPtr = &requiredMatrix;
     this->drawShape(requiredMatrixPtr);
+    requiredMatrixPtr = NULL;
 }
 
+// To show Reflection Demonstration
 void Shape ::reflection()
 {
     cout << "REFLECTION \n"
@@ -343,6 +399,7 @@ void Shape ::reflection()
         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
         this->drawShape(requiredMatrixPtr);
+        requiredMatrixPtr = NULL;
     }
     break;
     case 2:
@@ -351,6 +408,7 @@ void Shape ::reflection()
         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
         this->drawShape(requiredMatrixPtr);
+        requiredMatrixPtr = NULL;
     }
     break;
     case 3:
@@ -359,6 +417,7 @@ void Shape ::reflection()
         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
         this->drawShape(requiredMatrixPtr);
+        requiredMatrixPtr = NULL;
     }
     break;
     case 4:
@@ -367,6 +426,7 @@ void Shape ::reflection()
         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
         this->drawShape(requiredMatrixPtr);
+        requiredMatrixPtr = NULL;
     }
     break;
     case 5:
@@ -375,6 +435,7 @@ void Shape ::reflection()
         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
         this->drawShape(requiredMatrixPtr);
+        requiredMatrixPtr = NULL;
     }
     break;
     case 6:
@@ -389,59 +450,130 @@ void Shape ::reflection()
         cin >> B;
         cout << "C : ";
         cin >> C;
-        float slope = (-A) / (B);
-        float y_intercept = (-C) / (B);
-        float x_intercept = (-C) / (A);
-        float theta = atan(slope);
-        cout << "Slope : " << slope << "\n";
-        cout << "x_intercept : " << x_intercept << "\n";
-        cout << "y_intercept : " << y_intercept << "\n";
-        cout << "theta : " << theta << "\n";
 
-        // Drawing the Reflection Line
-        float x1 = getmaxx();
-        float y1 = slope * x1 + y_intercept;
-        float y2 = getmaxy();
-        float x2 = (y2 - y_intercept) / slope;
-        Matrix *reflectionLine = new Matrix(numberOfCoOrdinates, 3);
-        reflectionLine->m[0][0] = x1;
-        reflectionLine->m[0][1] = y1;
-        reflectionLine->m[1][0] = x2;
-        reflectionLine->m[1][1] = y2;
-        this->drawShape(reflectionLine);
-        delete reflectionLine;
+        // About x-axis with some translation
+        if ((A != 0) && (B == 0) && (C != 0))
+        {
+            // Line about which the reflection will be performed
+            Matrix *reflectionLine = new Matrix(2, 3);
+            reflectionLine->m[0][0] = 0;
+            reflectionLine->m[0][1] = getmaxy();
+            reflectionLine->m[0][2] = 1;
+            reflectionLine->m[1][0] = 0;
+            reflectionLine->m[1][1] = -getmaxy();
+            reflectionLine->m[1][2] = 1;
 
-        // Translate the line to Origin
-        Matrix translateMat = getTranslationMatrix(0, y_intercept);
-        // Rotate the line to coincide with x-axis
-        Matrix rotationMatrix = getRotationMatrixClockwise(theta);
-        // Reflection about x-axis
-        Matrix reflectionMatrix = getReflectionMatrixAboutX();
-        // Rotate the line to coincide with x-axis
-        Matrix rotationMatrixInverse = rotationMatrix.transpose();
-        // Re-translate to original point
-        Matrix translateMatInverse = getTranslationMatrix(0, -y_intercept);
-        // Composition Matrix
-        Matrix compositionMatrix = translateMat * rotationMatrix * reflectionMatrix * rotationMatrixInverse * translateMatInverse;
-        Matrix requiredMatrix = (*(this->coOrdinates)) * (compositionMatrix);
-        Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+            // Drawing the Reflection Line
+            Matrix translationMatrix = getTranslationMatrix(C, 0);
+            Matrix requiredLineMatrix = (*reflectionLine) * translationMatrix;
+            Matrix *requiredLineMatrixPtr = &requiredLineMatrix;
+            this->drawShape(requiredLineMatrixPtr);
+            requiredLineMatrixPtr = NULL;
+            delete reflectionLine;
+
+            // Drawing the Reflected Figure
+            Matrix reflectionMatrix = getReflectionMatrixAboutY();
+            Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix * translationMatrix;
+            Matrix *requiredMatrixPtr = &requiredMatrix;
+            this->drawShape(requiredMatrixPtr);
+            requiredMatrixPtr = NULL;
+        }
+        // About y-axis with some translation
+        else if ((A == 0) && (B != 0) && (C != 0))
+        {
+            // Line about which the reflection will be performed
+            Matrix *reflectionLine = new Matrix(2, 3);
+            reflectionLine->m[0][0] = getmaxx();
+            reflectionLine->m[0][1] = 0;
+            reflectionLine->m[0][2] = 1;
+            reflectionLine->m[1][0] = -getmaxx();
+            reflectionLine->m[1][1] = 0;
+            reflectionLine->m[1][2] = 1;
+
+            // Drawing the Reflection Line
+            Matrix translationMatrix = getTranslationMatrix(0, C);
+            Matrix requiredLineMatrix = (*reflectionLine) * translationMatrix;
+            requiredLineMatrix.display();
+            Matrix *requiredLineMatrixPtr = &requiredLineMatrix;
+            this->drawShape(requiredLineMatrixPtr);
+            requiredLineMatrixPtr = NULL;
+            delete reflectionLine;
+
+            // Drawing the Reflected Figure
+            Matrix reflectionMatrix = getReflectionMatrixAboutX();
+            Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix * translationMatrix;
+            Matrix *requiredMatrixPtr = &requiredMatrix;
+            this->drawShape(requiredMatrixPtr);
+            requiredMatrixPtr = NULL;
+        }
+        else
+        {
+            // Arbitary Line Parameters
+            float slope = (-A) / (B);
+            float y_intercept = (-C) / (B);
+            float x_intercept = (-C) / (A);
+            float theta = atan(slope);
+            cout << "Slope : " << slope << "\n";
+            cout << "x_intercept : " << x_intercept << "\n";
+            cout << "y_intercept : " << y_intercept << "\n";
+            cout << "theta : " << theta << "\n";
+
+            // Drawing the Reflection Line
+            float x1 = getmaxx();
+            float y1 = slope * x1 + y_intercept;
+            float y2 = getmaxy();
+            float x2 = (y2 - y_intercept) / slope;
+            float x3 = -1 * getmaxx();
+            float y3 = slope * x3 + y_intercept;
+            float y4 = -1 * getmaxy();
+            float x4 = (y4 - y_intercept) / slope;
+            Matrix *reflectionLine = new Matrix(4, 3);
+            reflectionLine->m[0][0] = x1;
+            reflectionLine->m[0][1] = y1;
+            reflectionLine->m[1][0] = x2;
+            reflectionLine->m[1][1] = y2;
+            reflectionLine->m[2][0] = x3;
+            reflectionLine->m[2][1] = y3;
+            reflectionLine->m[3][0] = x4;
+            reflectionLine->m[3][1] = y4;
+            this->drawShape(reflectionLine);
+            delete reflectionLine;
+
+            // Translate the line to Origin
+            Matrix translateMat = getTranslationMatrix(0, y_intercept);
+            // Rotate the line to coincide with x-axis
+            Matrix rotationMatrix = getRotationMatrixClockwise(theta);
+            // Reflection about x-axis
+            Matrix reflectionMatrix = getReflectionMatrixAboutX();
+            // Rotate the line to coincide with x-axis
+            Matrix rotationMatrixInverse = rotationMatrix.transpose();
+            // Re-translate to original point
+            Matrix translateMatInverse = getTranslationMatrix(0, -y_intercept);
+            // Composition Matrix
+            Matrix compositionMatrix = translateMat * rotationMatrix * reflectionMatrix * rotationMatrixInverse * translateMatInverse;
+            Matrix requiredMatrix = (*(this->coOrdinates)) * (compositionMatrix);
+            Matrix *requiredMatrixPtr = &requiredMatrix;
+            this->drawShape(requiredMatrixPtr);
+            requiredMatrixPtr = NULL;
+        }
     }
     break;
     default:
     {
         cout << "INVALID\n";
     }
-    break;
+        return;
     }
 }
 
+// To show Shearing Demonstration
 void Shape ::shearing()
 {
     cout << "SHEARING \n"
          << "1. about x-component \n"
          << "2. about y-component \n"
-         << "3. about both x-component and y-component \n";
+         << "3. about both x-component and y-component \n"
+         << "Enter Option : ";
     float shearingX = 1;
     float shearingY = 1;
     int option;
@@ -456,6 +588,7 @@ void Shape ::shearing()
         Matrix requiredMatrix = (*(this->coOrdinates)) * (shearingMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
         this->drawShape(requiredMatrixPtr);
+        requiredMatrixPtr = NULL;
     }
     break;
     case 2:
@@ -466,6 +599,7 @@ void Shape ::shearing()
         Matrix requiredMatrix = (*(this->coOrdinates)) * (shearingMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
         this->drawShape(requiredMatrixPtr);
+        requiredMatrixPtr = NULL;
     }
     break;
     case 3:
@@ -478,23 +612,26 @@ void Shape ::shearing()
         Matrix requiredMatrix = (*(this->coOrdinates)) * (shearingMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
         this->drawShape(requiredMatrixPtr);
+        requiredMatrixPtr = NULL;
     }
     break;
     default:
     {
         cout << "INVALID\n";
     }
-    break;
+        return;
     }
 }
 
+// To show Rotation Demonstration
 void Shape ::rotation()
 {
     cout << "ROTATION \n"
          << "1. Counter Clockwise about Origin \n"
          << "2. Clockwise about Origin \n"
          << "3. Counter Clockwise about an arbitary point\n"
-         << "4. Clockwise about an arbitary point\n";
+         << "4. Clockwise about an arbitary point\n"
+         << "Enter Option : ";
     int option;
     cin >> option;
     double pi = 4 * atan(1);
@@ -510,6 +647,7 @@ void Shape ::rotation()
         Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
         this->drawShape(requiredMatrixPtr);
+        requiredMatrixPtr = NULL;
     }
     break;
     case 2:
@@ -521,6 +659,7 @@ void Shape ::rotation()
         Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
         this->drawShape(requiredMatrixPtr);
+        requiredMatrixPtr = NULL;
     }
     break;
     case 3:
@@ -528,18 +667,21 @@ void Shape ::rotation()
         cout << "Enter Angle : ";
         cin >> theta;
         theta *= (pi / 180);
-        int x, y;
+        float x, y;
         cout << "Enter Co-Ordinates of the Points \n";
         cout << "x : ";
         cin >> x;
         cout << "y : ";
         cin >> y;
+        // Plotting the arbitary Co-Ordinate
+        putpixel((x + (getmaxx() / 2)), ((-1 * y) + (getmaxy() / 2)), 3);
         Matrix T = getTranslationMatrix(x, y);
         Matrix R = getRotationMatrixCounterClockwise(theta);
         Matrix T_inverse = getTranslationMatrix(-x, -y);
         Matrix requiredMatrix = (*(this->coOrdinates)) * T * R * T_inverse;
         Matrix *requiredMatrixPtr = &requiredMatrix;
         this->drawShape(requiredMatrixPtr);
+        requiredMatrixPtr = NULL;
     }
     break;
     case 4:
@@ -553,6 +695,8 @@ void Shape ::rotation()
         cin >> x;
         cout << "y : ";
         cin >> y;
+        // Plotting the arbitary Co-Ordinate
+        putpixel((x + (getmaxx() / 2)), ((-1 * y) + (getmaxy() / 2)), 3);
         Matrix T = getTranslationMatrix(x, y);
         Matrix R = getRotationMatrixClockwise(theta);
         Matrix T_inverse = getTranslationMatrix(-x, -y);
@@ -560,6 +704,7 @@ void Shape ::rotation()
         Matrix *requiredMatrixPtr = &requiredMatrix;
         cout << requiredMatrixPtr << "\n";
         this->drawShape(requiredMatrixPtr);
+        requiredMatrixPtr = NULL;
     }
     break;
 
@@ -567,15 +712,16 @@ void Shape ::rotation()
     {
         cout << "INVALID\n";
     }
-    break;
+        return;
     }
 }
 
+// To show Translation Demonstration
 void Shape::translation()
 {
     cout << "TRANSLATION \n";
-    int xFactor = 0;
-    int yFactor = 0;
+    float xFactor = 0;
+    float yFactor = 0;
     cout << "Translate x co-ordinate by : ";
     cin >> xFactor;
     cout << "Translate y co-ordinate by : ";
@@ -584,15 +730,17 @@ void Shape::translation()
     Matrix requiredMatrix = (*(this->coOrdinates)) * (translationMatrix);
     Matrix *requiredMatrixPtr = &requiredMatrix;
     this->drawShape(requiredMatrixPtr);
+    requiredMatrixPtr = NULL;
 }
 
+// To show Translation Demonstration
 void Shape ::transformationMatrix()
 {
     Matrix transformationMat(3, 3);
     int option = 0;
     cout << "Choose Option\n"
-         << "2x2 Matrix\n"
-         << "3x3 Matrix\n"
+         << "1. 2x2 Matrix\n"
+         << "2. 3x3 Matrix\n"
          << " : ";
     cin >> option;
     switch (option)
@@ -619,10 +767,14 @@ void Shape ::transformationMatrix()
 
         break;
     default:
-        break;
+        cout << "INVALID\n";
+        return;
     }
-    transformationMat.print();
+    cout << "Transformation Matrix : \n";
+    transformationMat.display();
+    cout << "\n";
     Matrix requiredMatrix = (*(this->coOrdinates)) * (transformationMat);
     Matrix *requiredMatrixPtr = &requiredMatrix;
     this->drawShape(requiredMatrixPtr);
+    requiredMatrixPtr = NULL;
 }
