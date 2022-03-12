@@ -237,3 +237,13 @@ Matrix getProjectionZ()
     projectionZ.m[2][2] = 0;
     return projectionZ;
 }
+
+// PRESPECTIVE PROJECTION
+Matrix getPrespectiveProjMatrix(float p, float q, float r)
+{
+    Matrix prespectiveMatrix(4, 4);
+    prespectiveMatrix.m[0][3] = p;
+    prespectiveMatrix.m[1][3] = q;
+    prespectiveMatrix.m[2][3] = r;
+    return prespectiveMatrix;
+}
