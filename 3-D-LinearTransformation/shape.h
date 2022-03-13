@@ -4,6 +4,12 @@
 #include "matrix.h"
 using namespace std;
 
+void drawAxis()
+{
+    line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
+    line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
+}
+
 // Shape Class
 class Shape
 {
@@ -164,11 +170,55 @@ public:
     void translation();
     void transformationMatrix();
     float *getCentroid(Matrix *m);
+    void drawOrthographicProjection(Matrix *m, float theta, float phi, float ita, char *heading);
     void orthographicProjection(Matrix *m);
+    void drawAxonometricProjection(Matrix *m, float theta, float phi, char *heading);
     void axonometricProjection(Matrix *m);
+    void drawPrespectiveProjection(Matrix *m, float p, float q, float r, char *heading);
     void prespectiveProjection(Matrix *m);
     void axisAnimation(Matrix *m);
+    void animation(Matrix *matrix);
 };
+
+void Shape ::animation(Matrix *matrix)
+{
+    double pi = 4 * atan(1);
+    float *centroid = this->getCentroid(matrix);
+    Matrix T = getTranslationMatrix(centroid[0], centroid[1], centroid[2]);
+    Matrix T_inv = getTranslationMatrix(-1 * centroid[0], -1 * centroid[1], -1 * centroid[2]);
+    Matrix pZ = getProjectionZ();
+    char text[50 + sizeof(char)];
+
+    int i = 0;
+    while (i != 3600)
+    {
+        float theta = i * (pi / 180);
+        float phi = -0.25 * i * (pi / 180);
+        float ita = 0.25 * i * (pi / 180);
+        float threeSixty = 360;
+
+        sprintf(text, "Rotation Angles");
+        outtextxy(20, 20, text);
+        drawAxis();
+        sprintf(text, "theta : %f \t", fmod((theta * 180 / pi), threeSixty));
+        outtextxy(20, 40, text);
+        sprintf(text, "phi : %f", fmod((phi * 180 / pi), threeSixty));
+        outtextxy(20, 60, text);
+        sprintf(text, "ita : %f", fmod((ita * 180 / pi), threeSixty));
+        outtextxy(20, 80, text);
+
+        Matrix rotateY = getRotationMatrixCounterClockwiseY(theta);
+        Matrix rotateX = getRotationMatrixCounterClockwiseX(phi);
+        Matrix rotateZ = getRotationMatrixCounterClockwiseX(ita);
+        Matrix scaleMatrix = getScaleMatrix(2.5, 2.5, 2.5);
+        Matrix requiredMatrix = (*(matrix)) * T * rotateX * rotateY * rotateZ * T_inv * pZ;
+        Matrix *requiredMatrixPtr = &requiredMatrix;
+        this->drawShape(requiredMatrixPtr);
+        delay(10);
+        cleardevice();
+        i++;
+    }
+}
 
 // To Draw the Polygon whose Co-Ordinate are passes as in Homogenous Matrix as a "matrix" object
 void Shape::drawShape(Matrix *matrix)
@@ -207,315 +257,173 @@ void Shape::convertToHomogenous(Matrix *matrix)
     }
 }
 
-void Shape ::prespectiveProjection(Matrix *m)
+void Shape::drawPrespectiveProjection(Matrix *m, float p, float q, float r, char *heading)
 {
-    double pi = 4 * atan(1);
     float *centroid = getCentroid(m);
-    this->coOrdinates->display();
     Matrix T = getTranslationMatrix(centroid[0], centroid[1], centroid[2]);
     Matrix T_inv = getTranslationMatrix(-1 * centroid[0], -1 * centroid[1], -1 * centroid[2]);
     Matrix pZ = getProjectionZ();
+    char text[50 + sizeof(char)];
+
+    sprintf(text, "Prespective -> Single Point");
+    outtextxy(20, 20, heading);
+    sprintf(text, "p : %f \t", p);
+    outtextxy(20, 40, text);
+    sprintf(text, "q : %f", q);
+    outtextxy(20, 60, text);
+    sprintf(text, "r : %f", r);
+    outtextxy(20, 80, text);
+
+    Matrix prespective = getPrespectiveProjMatrix(p, q, r);
+    Matrix requiredMatrix = (*(m)) * T * prespective * T_inv * pZ;
+    Matrix *requiredMatrixPtr = &requiredMatrix;
+    this->convertToHomogenous(requiredMatrixPtr);
+    this->drawShape(requiredMatrixPtr);
+}
+
+void Shape ::prespectiveProjection(Matrix *m)
+{
     char text[50 + sizeof(char)];
     float p = 0;
     float q = 0;
     float r = 0;
 
     // SINGLE POINT
-    { // z -axis
-
+    sprintf(text, "Prespective -> Single Point");
+    {
+        // z -axis
         for (int i = 0; i < 10; i++)
         {
-            // Grid Lines
-            line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-            line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
+            drawAxis();
             r = -1 * (float)i / 1000;
-
-            sprintf(text, "Prespective -> Single Point");
-            outtextxy(20, 20, text);
-            sprintf(text, "p : %f \t", p);
-            outtextxy(20, 40, text);
-            sprintf(text, "q : %f", q);
-            outtextxy(20, 60, text);
-            sprintf(text, "r : %f", r);
-            outtextxy(20, 80, text);
-
-            Matrix prespective = getPrespectiveProjMatrix(p, q, r);
-            Matrix requiredMatrix = (*(m)) * T * prespective * T_inv * pZ;
-            Matrix *requiredMatrixPtr = &requiredMatrix;
-            this->convertToHomogenous(requiredMatrixPtr);
-            this->drawShape(requiredMatrixPtr);
+            this->drawPrespectiveProjection(m, p, q, r, text);
             delay(1000);
             cleardevice();
         }
 
+        // y
         p = q = r = 0;
-        sprintf(text, "Prespective -> Single Point");
-        outtextxy(20, 20, text);
-        sprintf(text, "p : %f \t", 0);
-        outtextxy(20, 40, text);
-        sprintf(text, "q : %f", 0);
-        outtextxy(20, 60, text);
-        sprintf(text, "r : %f", 0);
-        outtextxy(20, 80, text);
-
-        // y -axis
         for (int i = 0; i < 10; i++)
         {
-            // Grid Lines
-            line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-            line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-
+            drawAxis();
             q = -1 * (float)i / 1000;
-
-            sprintf(text, "Prespective -> Single Point");
-            outtextxy(20, 20, text);
-            sprintf(text, "p : %f \t", p);
-            outtextxy(20, 40, text);
-            sprintf(text, "q : %f", q);
-            outtextxy(20, 60, text);
-            sprintf(text, "r : %f", r);
-            outtextxy(20, 80, text);
-
-            Matrix prespective = getPrespectiveProjMatrix(p, q, r);
-            Matrix requiredMatrix = (*(m)) * T * prespective * T_inv * pZ;
-            Matrix *requiredMatrixPtr = &requiredMatrix;
-            this->convertToHomogenous(requiredMatrixPtr);
-            this->drawShape(requiredMatrixPtr);
+            this->drawPrespectiveProjection(m, p, q, r, text);
             delay(1000);
             cleardevice();
         }
 
+        // x
         p = q = r = 0;
-        sprintf(text, "Prespective -> Single Point");
-        outtextxy(20, 20, text);
-        sprintf(text, "p : %f \t", 0);
-        outtextxy(20, 40, text);
-        sprintf(text, "q : %f", 0);
-        outtextxy(20, 60, text);
-        sprintf(text, "r : %f", 0);
-        outtextxy(20, 80, text);
-
-        // x -axis
         for (int i = 0; i < 10; i++)
         {
-            // Grid Lines
-            line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-            line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-
+            drawAxis();
             p = -1 * (float)i / 1000;
-
-            sprintf(text, "Prespective -> Single Point");
-            outtextxy(20, 20, text);
-            sprintf(text, "p : %f \t", p);
-            outtextxy(20, 40, text);
-            sprintf(text, "q : %f", q);
-            outtextxy(20, 60, text);
-            sprintf(text, "r : %f", r);
-            outtextxy(20, 80, text);
-
-            Matrix prespective = getPrespectiveProjMatrix(p, q, r);
-            Matrix requiredMatrix = (*(m)) * T * prespective * T_inv * pZ;
-            Matrix *requiredMatrixPtr = &requiredMatrix;
-            this->convertToHomogenous(requiredMatrixPtr);
-            this->drawShape(requiredMatrixPtr);
+            this->drawPrespectiveProjection(m, p, q, r, text);
             delay(1000);
             cleardevice();
         }
     }
 
     // TWO POINT
+    sprintf(text, "Prespective -> Two Point");
     {
+        // xy
         p = q = r = 0;
-        sprintf(text, "Prespective -> Two Point");
-        outtextxy(20, 20, text);
-        sprintf(text, "p : %f \t", 0);
-        outtextxy(20, 40, text);
-        sprintf(text, "q : %f", 0);
-        outtextxy(20, 60, text);
-        sprintf(text, "r : %f", 0);
-        outtextxy(20, 80, text);
-        // xy -axis
         for (int i = 0; i < 10; i++)
         {
-            // Grid Lines
-            line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-            line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
+            drawAxis();
             p = -1 * (float)i / 1000;
             q = -1 * (float)i / 1000;
-
-            sprintf(text, "Prespective -> Two Point");
-            outtextxy(20, 20, text);
-            sprintf(text, "p : %f \t", p);
-            outtextxy(20, 40, text);
-            sprintf(text, "q : %f", q);
-            outtextxy(20, 60, text);
-            sprintf(text, "r : %f", r);
-            outtextxy(20, 80, text);
-
-            Matrix prespectiveZ = getPrespectiveProjMatrix(p, q, r);
-            Matrix requiredMatrix = (*(m)) * T * prespectiveZ * T_inv * pZ;
-            Matrix *requiredMatrixPtr = &requiredMatrix;
-            this->convertToHomogenous(requiredMatrixPtr);
-            this->drawShape(requiredMatrixPtr);
+            this->drawPrespectiveProjection(m, p, q, r, text);
             delay(1000);
             cleardevice();
         }
 
-        sprintf(text, "Prespective -> Two Point");
-        outtextxy(20, 20, text);
-        sprintf(text, "p : %f \t", 0);
-        outtextxy(20, 40, text);
-        sprintf(text, "q : %f", 0);
-        outtextxy(20, 60, text);
-        sprintf(text, "r : %f", 0);
-        outtextxy(20, 80, text);
-
-        // xz -axis
+        // xz
         p = q = r = 0;
         for (int i = 0; i < 10; i++)
         {
-            // Grid Lines
-            line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-            line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-
+            drawAxis();
             p = -1 * (float)i / 1000;
             r = -1 * (float)i / 1000;
-
-            sprintf(text, "Prespective -> Two Point");
-            outtextxy(20, 20, text);
-            sprintf(text, "p : %f \t", p);
-            outtextxy(20, 40, text);
-            sprintf(text, "q : %f", q);
-            outtextxy(20, 60, text);
-            sprintf(text, "r : %f", r);
-            outtextxy(20, 80, text);
-
-            Matrix prespectiveY = getPrespectiveProjMatrix(p, q, r);
-            Matrix requiredMatrix = (*(m)) * T * prespectiveY * T_inv * pZ;
-            Matrix *requiredMatrixPtr = &requiredMatrix;
-            this->convertToHomogenous(requiredMatrixPtr);
-            this->drawShape(requiredMatrixPtr);
+            this->drawPrespectiveProjection(m, p, q, r, text);
             delay(1000);
             cleardevice();
         }
 
-        sprintf(text, "Prespective -> Two Point");
-        outtextxy(20, 20, text);
-        sprintf(text, "p : %f \t", 0);
-        outtextxy(20, 40, text);
-        sprintf(text, "q : %f", 0);
-        outtextxy(20, 60, text);
-        sprintf(text, "r : %f", 0);
-        outtextxy(20, 80, text);
-
-        // yz -axis
+        // yz
         p = q = r = 0;
         for (int i = 0; i < 10; i++)
         {
-            // Grid Lines
-            line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-            line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-
+            drawAxis();
             q = -1 * (float)i / 1000;
             r = -1 * (float)i / 1000;
-
-            sprintf(text, "Prespective -> Two Point");
-            outtextxy(20, 20, text);
-            sprintf(text, "p : %f \t", p);
-            outtextxy(20, 40, text);
-            sprintf(text, "q : %f", q);
-            outtextxy(20, 60, text);
-            sprintf(text, "r : %f", r);
-            outtextxy(20, 80, text);
-
-            Matrix prespective = getPrespectiveProjMatrix(p, q, r);
-            Matrix requiredMatrix = (*(m)) * T * prespective * T_inv * pZ;
-            Matrix *requiredMatrixPtr = &requiredMatrix;
-            this->convertToHomogenous(requiredMatrixPtr);
-            this->drawShape(requiredMatrixPtr);
+            this->drawPrespectiveProjection(m, p, q, r, text);
             delay(1000);
             cleardevice();
         }
     }
 
     // THREE POINT
+    sprintf(text, "Prespective -> Three Point");
     {
         p = q = r = 0;
-        sprintf(text, "Prespective -> Three Point");
-        outtextxy(20, 20, text);
-        sprintf(text, "p : %f \t", 0);
-        outtextxy(20, 40, text);
-        sprintf(text, "q : %f", 0);
-        outtextxy(20, 60, text);
-        sprintf(text, "r : %f", 0);
-        outtextxy(20, 80, text);
 
-        p = q = r = 0;
         for (int i = 0; i < 10; i++)
         {
-            // Grid Lines
-            line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-            line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-
+            drawAxis();
             p = -1 * (float)i / 1000;
             q = -1 * (float)i / 1000;
             r = -1 * (float)i / 1000;
-
-            sprintf(text, "Prespective -> Three Point");
-            outtextxy(20, 20, text);
-            sprintf(text, "p : %f \t", p);
-            outtextxy(20, 40, text);
-            sprintf(text, "q : %f", q);
-            outtextxy(20, 60, text);
-            sprintf(text, "r : %f", r);
-            outtextxy(20, 80, text);
-
-            Matrix prespective = getPrespectiveProjMatrix(p, q, r);
-            Matrix requiredMatrix = (*(m)) * T * prespective * T_inv * pZ;
-            Matrix *requiredMatrixPtr = &requiredMatrix;
-            this->convertToHomogenous(requiredMatrixPtr);
-            this->drawShape(requiredMatrixPtr);
+            this->drawPrespectiveProjection(m, p, q, r, text);
             delay(1000);
             cleardevice();
         }
     }
 }
 
-void Shape::axonometricProjection(Matrix *m)
+void Shape::drawAxonometricProjection(Matrix *m, float theta, float phi, char *heading)
 {
-    double pi = 4 * atan(1);
+    double pi = 4 * atanf(1);
     float *centroid = getCentroid(m);
-    this->coOrdinates->display();
     Matrix T = getTranslationMatrix(centroid[0], centroid[1], centroid[2]);
     Matrix T_inv = getTranslationMatrix(-1 * centroid[0], -1 * centroid[1], -1 * centroid[2]);
     Matrix pZ = getProjectionZ();
+    char text[50 + sizeof(char)];
+
+    outtextxy(20, 20, heading);
+    sprintf(text, "theta : %d \t", (int)(theta * 180 / pi));
+    outtextxy(20, 40, text);
+    sprintf(text, "phi : %d", (int)(phi * 180 / pi));
+    outtextxy(20, 60, text);
+
+    Matrix rotateX = getRotationMatrixCounterClockwiseX(theta);
+    Matrix rotateY = getRotationMatrixCounterClockwiseY(phi);
+    Matrix translate = getTranslationMatrix(centroid[0] / 20, centroid[1] / 20, centroid[2] / 20);
+    Matrix requiredMatrix = (*(m)) * T * rotateY * rotateX * T_inv * translate * pZ;
+    Matrix *requiredMatrixPtr = &requiredMatrix;
+    this->drawShape(requiredMatrixPtr);
+}
+
+void Shape::axonometricProjection(Matrix *m)
+{
+    double pi = 4 * atan(1);
+    char text[50 + sizeof(char)];
+    float theta = 0;
+    float phi = 0;
 
     // TRIMETRIC
-    // TAKING THE EXAMPLE OF ROTAION IN x-axis FOLLOWED BY y-axis
+    // TAKING THE EXAMPLE OF ROTAION IN y-axis FOLLOWED BY x-axis
+    sprintf(text, "Axonometric -> Trimetric");
     for (int i = 0; i <= 90; i += 15)
     {
         for (int j = 15; j <= 45; j += 15)
         {
             // Grid Lines
-            line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-            line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-            float theta = i * (pi / 180);
-            float phi = j * (pi / 180);
-
-            char text[50 + sizeof(char)];
-            sprintf(text, "Axonometric -> Trimetric", i);
-            outtextxy(20, 20, text);
-            sprintf(text, "theta : %d \t", i);
-            outtextxy(20, 40, text);
-            sprintf(text, "phi : %d", j);
-            outtextxy(20, 60, text);
-
-            Matrix rotateX = getRotationMatrixCounterClockwiseX(theta);
-            Matrix rotateY = getRotationMatrixCounterClockwiseY(phi);
-            Matrix translate = getTranslationMatrix(centroid[0] / 20, centroid[1] / 20, centroid[2] / 20);
-            Matrix requiredMatrix = (*(m)) * T * rotateY * rotateX * T_inv * translate * pZ;
-            Matrix *requiredMatrixPtr = &requiredMatrix;
-            this->drawShape(requiredMatrixPtr);
+            drawAxis();
+            theta = i * (pi / 180);
+            phi = j * (pi / 180);
+            drawAxonometricProjection(m, theta, phi, text);
             delay(1000);
             // system("pause");
             cleardevice();
@@ -524,219 +432,131 @@ void Shape::axonometricProjection(Matrix *m)
 
     // DIMETRIC
     {
+        float fz = 0;
         for (int i = 0; i < 9; i++)
         {
-            // Grid Lines
-            line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-            line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-            float fz = 0.125 * i;
-            // cout << fz << "\n";
-            float theta = asin(fz / sqrt(2));
-            float phi = asin(fz / sqrt(2 - powf(fz, 2)));
-
-            char text[50 + sizeof(char)];
             sprintf(text, "Axonometric -> Dimetric");
-            outtextxy(20, 20, text);
-            sprintf(text, "theta : %f \t", theta * 180 / pi);
-            outtextxy(20, 40, text);
-            sprintf(text, "phi : %f", phi * 180 / pi);
-            outtextxy(20, 60, text);
+            drawAxis();
+            fz = 0.125 * i;
+            theta = asin(fz / sqrt(2));
+            phi = asin(fz / sqrt(2 - powf(fz, 2)));
+            drawAxonometricProjection(m, theta, phi, text);
             sprintf(text, "fz : %f", fz);
             outtextxy(20, 80, text);
-
-            Matrix rotateX = getRotationMatrixCounterClockwiseX(theta);
-            Matrix rotateY = getRotationMatrixCounterClockwiseY(phi);
-            Matrix requiredMatrix = (*(m)) * T * rotateY * rotateX * T_inv * pZ;
-            Matrix *requiredMatrixPtr = &requiredMatrix;
-            this->drawShape(requiredMatrixPtr);
             delay(1000);
             cleardevice();
         }
     }
     // ISOMETRIC
     {
-        // Grid Lines
-        line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-        line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-        float theta = 35.26 * (pi / 180);
-        float phi = -45 * (pi / 180);
-
-        char text[50 + sizeof(char)];
         sprintf(text, "Axonometric -> Isometric");
-        outtextxy(20, 20, text);
-        sprintf(text, "theta : %f \t", theta * 180 / pi);
-        outtextxy(20, 40, text);
-        sprintf(text, "phi : %f", phi * 180 / pi);
-        outtextxy(20, 60, text);
 
-        Matrix rotateX = getRotationMatrixCounterClockwiseX(theta);
-        Matrix rotateY = getRotationMatrixCounterClockwiseY(phi);
-        Matrix requiredMatrix = (*(m)) * T * rotateY * rotateX * T_inv * pZ;
-        Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        // (35.26, -45)
+        drawAxis();
+        theta = 35.26 * (pi / 180);
+        phi = -45 * (pi / 180);
+        drawAxonometricProjection(m, theta, phi, text);
         delay(1000);
         cleardevice();
-    }
-    {
-        // Grid Lines
-        line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-        line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-        float theta = -35.26 * (pi / 180);
-        float phi = -45 * (pi / 180);
 
-        char text[50 + sizeof(char)];
-        sprintf(text, "Axonometric -> Isometric");
-        outtextxy(20, 20, text);
-        sprintf(text, "theta : %f \t", theta * 180 / pi);
-        outtextxy(20, 40, text);
-        sprintf(text, "phi : %f", phi * 180 / pi);
-        outtextxy(20, 60, text);
-
-        Matrix rotateX = getRotationMatrixCounterClockwiseX(theta);
-        Matrix rotateY = getRotationMatrixCounterClockwiseY(phi);
-        Matrix requiredMatrix = (*(m)) * T * rotateY * rotateX * T_inv * pZ;
-        Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        // (-35.26, -45)
+        drawAxis();
+        theta = -35.26 * (pi / 180);
+        phi = -45 * (pi / 180);
+        drawAxonometricProjection(m, theta, phi, text);
         delay(1000);
         cleardevice();
-    }
-    {
-        // Grid Lines
-        line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-        line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-        float theta = 35.26 * (pi / 180);
-        float phi = 45 * (pi / 180);
 
-        char text[50 + sizeof(char)];
-        sprintf(text, "Axonometric -> Isometric");
-        outtextxy(20, 20, text);
-        sprintf(text, "theta : %f \t", theta * 180 / pi);
-        outtextxy(20, 40, text);
-        sprintf(text, "phi : %f", phi * 180 / pi);
-        outtextxy(20, 60, text);
-
-        Matrix rotateX = getRotationMatrixCounterClockwiseX(theta);
-        Matrix rotateY = getRotationMatrixCounterClockwiseY(phi);
-        Matrix requiredMatrix = (*(m)) * T * rotateY * rotateX * T_inv * pZ;
-        Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        // (35.26, 45)
+        drawAxis();
+        theta = 35.26 * (pi / 180);
+        phi = 45 * (pi / 180);
+        drawAxonometricProjection(m, theta, phi, text);
         delay(1000);
         cleardevice();
-    }
-    {
-        // Grid Lines
-        line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-        line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-        float theta = -35.26 * (pi / 180);
-        float phi = 45 * (pi / 180);
 
-        char text[50 + sizeof(char)];
-        sprintf(text, "Axonometric -> Isometric");
-        outtextxy(20, 20, text);
-        sprintf(text, "theta : %f \t", theta * 180 / pi);
-        outtextxy(20, 40, text);
-        sprintf(text, "phi : %f", phi * 180 / pi);
-        outtextxy(20, 60, text);
-
-        Matrix rotateX = getRotationMatrixCounterClockwiseX(theta);
-        Matrix rotateY = getRotationMatrixCounterClockwiseY(phi);
-        Matrix requiredMatrix = (*(m)) * T * rotateY * rotateX * T_inv * pZ;
-        Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        // (-35.26, 45)
+        drawAxis();
+        theta = -35.26 * (pi / 180);
+        phi = 45 * (pi / 180);
+        drawAxonometricProjection(m, theta, phi, text);
         delay(1000);
         cleardevice();
     }
 }
 
-void Shape::orthographicProjection(Matrix *m)
+void Shape ::drawOrthographicProjection(Matrix *m, float theta, float phi, float ita, char *heading)
 {
     double pi = 4 * atan(1);
     float *centroid = getCentroid(m);
-    this->coOrdinates->display();
     Matrix T = getTranslationMatrix(centroid[0], centroid[1], centroid[2]);
     Matrix T_inv = getTranslationMatrix(-1 * centroid[0], -1 * centroid[1], -1 * centroid[2]);
     Matrix pZ = getProjectionZ();
+
+    Matrix rotateX = getRotationMatrixCounterClockwiseX(theta);
+    Matrix rotateY = getRotationMatrixCounterClockwiseY(phi);
+    Matrix rotateZ = getRotationMatrixCounterClockwiseZ(ita);
+
+    drawAxis();
+    outtextxy(20, 20, heading);
+
+    Matrix face = (*(m)) * T * rotateX * rotateY * rotateZ * T_inv * pZ;
+    Matrix *requiredMatrixPtr = &face;
+    this->drawShape(requiredMatrixPtr);
+}
+
+void Shape::orthographicProjection(Matrix *m)
+{
+    double pi = 4 * atan(1);
     char text[50 + sizeof(char)];
+    float theta = 0;
+    float phi = 0;
+    float ita = 0;
 
     // FRONT
     sprintf(text, "Orthographic -> FRONT");
-    outtextxy(20, 20, text);
-    line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-    line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-    Matrix Front = (*(m)) * pZ;
-    Matrix *requiredMatrixPtr = &Front;
-    this->drawShape(requiredMatrixPtr);
-    system("pause");
+    drawOrthographicProjection(m, theta, phi, ita, text);
+    delay(1000);
     cleardevice();
 
     // RIGHT
-    // Grid Lines
+    theta = phi = ita = 0;
     sprintf(text, "Orthographic -> RIGHT");
-    outtextxy(20, 20, text);
-    line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-    line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-    float theta = -90 * (pi / 180);
-    Matrix rotateY_90 = getRotationMatrixCounterClockwiseY(theta);
-    Matrix Right = (*(m)) * T * rotateY_90 * T_inv * pZ;
-    requiredMatrixPtr = &Right;
-    this->drawShape(requiredMatrixPtr);
-    system("pause");
+    phi = -90 * (pi / 180);
+    drawOrthographicProjection(m, theta, phi, ita, text);
+    delay(1000);
     cleardevice();
 
     // TOP
-    // Grid Lines
+    theta = phi = ita = 0;
     sprintf(text, "Orthographic -> TOP");
-    outtextxy(20, 20, text);
-    line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-    line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
     theta = 90 * (pi / 180);
-    Matrix rotateX90 = getRotationMatrixCounterClockwiseX(theta);
-    Matrix Top = (*(m)) * T * rotateX90 * T_inv * pZ;
-    requiredMatrixPtr = &Top;
-    this->drawShape(requiredMatrixPtr);
-    system("pause");
+    drawOrthographicProjection(m, theta, phi, ita, text);
+    delay(1000);
     cleardevice();
 
     // BOTTOM
-    // Grid Lines
+    theta = phi = ita = 0;
     sprintf(text, "Orthographic -> BOTTOM");
-    outtextxy(20, 20, text);
-    line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-    line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
     theta = -90 * (pi / 180);
-    Matrix rotateX_90 = getRotationMatrixCounterClockwiseX(theta);
-    Matrix Bottom = (*(m)) * T * rotateX_90 * T_inv * pZ;
-    requiredMatrixPtr = &Bottom;
-    this->drawShape(requiredMatrixPtr);
-    system("pause");
+    drawOrthographicProjection(m, theta, phi, ita, text);
+    delay(1000);
     cleardevice();
 
     // REAR
-    // Grid Lines
+    theta = phi = ita = 0;
     sprintf(text, "Orthographic -> REAR");
-    outtextxy(20, 20, text);
-    line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-    line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-    theta = 180 * (pi / 180);
-    Matrix rotateY180 = getRotationMatrixCounterClockwiseY(theta);
-    Matrix Rear = (*(m)) * T * rotateY180 * T_inv * pZ;
-    requiredMatrixPtr = &Rear;
-    this->drawShape(requiredMatrixPtr);
-    system("pause");
+    phi = 180 * (pi / 180);
+    drawOrthographicProjection(m, theta, phi, ita, text);
+    delay(1000);
     cleardevice();
 
     // LEFT
-    // Grid Lines
+    theta = phi = ita = 0;
     sprintf(text, "Orthographic -> LEFT");
-    outtextxy(20, 20, text);
-    line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-    line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-    theta = 90 * (pi / 180);
-    Matrix rotateY90 = getRotationMatrixCounterClockwiseY(theta);
-    Matrix Left = (*(m)) * T * rotateY90 * T_inv * pZ;
-    requiredMatrixPtr = &Left;
-    this->drawShape(requiredMatrixPtr);
-    system("pause");
+    phi = 90 * (pi / 180);
+    drawOrthographicProjection(m, theta, phi, ita, text);
+    delay(1000);
     cleardevice();
 }
 

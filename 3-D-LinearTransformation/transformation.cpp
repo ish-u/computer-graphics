@@ -22,37 +22,11 @@ int main()
     line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
     line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
 
-    // shape->scaling();
-    // ANIMATION
-    {
-        double pi = 4 * atan(1);
-        float *centroid = shape->getCentroid(shape->coOrdinates);
-        Matrix T = getTranslationMatrix(centroid[0], centroid[1], centroid[2]);
-        Matrix T_inv = getTranslationMatrix(-1 * centroid[0] / 4, -1 * centroid[1] / 4, -1 * centroid[2] / 4);
-        Matrix pZ = getProjectionZ();
-        char text[50 + sizeof(char)];
-
-        int i = 0;
-        while (i != 3600)
-        {
-            float theta = i * (pi / 180);
-            float phi = -0.5 * i * (pi / 180);
-
-            Matrix rotateY = getRotationMatrixCounterClockwiseY(theta);
-            Matrix rotateX = getRotationMatrixCounterClockwiseX(phi);
-            Matrix scaleMatrix = getScaleMatrix(2.5, 2.5, 2.5);
-            Matrix requiredMatrix = (*(shape->coOrdinates)) * T * rotateX * rotateY * scaleMatrix * pZ;
-            Matrix *requiredMatrixPtr = &requiredMatrix;
-            shape->drawShape(requiredMatrixPtr);
-            delay(10);
-            cleardevice();
-            i++;
-        }
-    }
+    shape->orthographicProjection(shape->coOrdinates);
+    shape->axonometricProjection(shape->coOrdinates);
+    shape->prespectiveProjection(shape->coOrdinates);
+    shape->animation(shape->coOrdinates);
     // shape->axisAnimation(shape->coOrdinates);
-    // shape->orthographicProjection(shape->coOrdinates);
-    // shape->axonometricProjection(shape->coOrdinates);
-    // shape->prespectiveProjection(shape->coOrdinates);
 
     // Menu
     // int flag = 1;
