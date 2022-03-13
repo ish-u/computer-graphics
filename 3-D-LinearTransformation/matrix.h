@@ -172,19 +172,19 @@ Matrix getShearingMatrix(float shearingFactorX, float shearingFactorY)
 // REFLECTION MATRICES
 Matrix getReflectionMatrixAboutXYPlane()
 {
-    Matrix reflectionMatrix(3, 3);
+    Matrix reflectionMatrix(4, 4);
     reflectionMatrix.m[2][2] = -1;
     return reflectionMatrix;
 }
 Matrix getReflectionMatrixAboutYZPlane()
 {
-    Matrix reflectionMatrix(3, 3);
+    Matrix reflectionMatrix(4, 4);
     reflectionMatrix.m[0][0] = -1;
     return reflectionMatrix;
 }
 Matrix getReflectionMatrixAboutXZPlane()
 {
-    Matrix reflectionMatrix(3, 3);
+    Matrix reflectionMatrix(4, 4);
     reflectionMatrix.m[1][1] = -1;
     return reflectionMatrix;
 }

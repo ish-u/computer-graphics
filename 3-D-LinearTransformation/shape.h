@@ -190,7 +190,7 @@ void Shape ::animation(Matrix *matrix)
     char text[50 + sizeof(char)];
 
     int i = 0;
-    while (i != 3600)
+    while (i != 360)
     {
         float theta = i * (pi / 180);
         float phi = -0.25 * i * (pi / 180);
@@ -714,199 +714,216 @@ void Shape::scaling()
     Matrix scaleMatrix = getScaleMatrix(scaleFactorX, scaleFactorY, scaleFactorZ);
     Matrix requiredMatrix = (*(this->coOrdinates)) * (scaleMatrix);
     Matrix *requiredMatrixPtr = &requiredMatrix;
-    this->orthographicProjection(requiredMatrixPtr);
+    // this->orthographicProjection(requiredMatrixPtr);
+    this->animation(requiredMatrixPtr);
     requiredMatrixPtr = NULL;
 }
 
 // To show Reflection Demonstration
-// void Shape ::reflection()
-// {
-//     cout << "REFLECTION \n"
-//          << "1. about x-axis \n"
-//          << "2. about y-axis \n"
-//          << "3. about origin \n"
-//          << "4. about x = y \n"
-//          << "5. about x = -y \n"
-//          << "6. about an arbitary line\n"
-//          << "Enter Option : ";
-//     int option;
-//     cin >> option;
-//     switch (option)
-//     {
-//     case 1:
-//     {
-//         Matrix reflectionMatrix = getReflectionMatrixAboutX();
-//         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
-//         Matrix *requiredMatrixPtr = &requiredMatrix;
-//         this->drawShape(requiredMatrixPtr);
-//         requiredMatrixPtr = NULL;
-//     }
-//     break;
-//     case 2:
-//     {
-//         Matrix reflectionMatrix = getReflectionMatrixAboutY();
-//         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
-//         Matrix *requiredMatrixPtr = &requiredMatrix;
-//         this->drawShape(requiredMatrixPtr);
-//         requiredMatrixPtr = NULL;
-//     }
-//     break;
-//     case 3:
-//     {
-//         Matrix reflectionMatrix = getReflectionMatrixAboutOrigin();
-//         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
-//         Matrix *requiredMatrixPtr = &requiredMatrix;
-//         this->drawShape(requiredMatrixPtr);
-//         requiredMatrixPtr = NULL;
-//     }
-//     break;
-//     case 4:
-//     {
-//         Matrix reflectionMatrix = getReflectionMatrixAboutXY();
-//         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
-//         Matrix *requiredMatrixPtr = &requiredMatrix;
-//         this->drawShape(requiredMatrixPtr);
-//         requiredMatrixPtr = NULL;
-//     }
-//     break;
-//     case 5:
-//     {
-//         Matrix reflectionMatrix = getReflectionMatrixAboutX_Y();
-//         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
-//         Matrix *requiredMatrixPtr = &requiredMatrix;
-//         this->drawShape(requiredMatrixPtr);
-//         requiredMatrixPtr = NULL;
-//     }
-//     break;
-//     case 6:
-//     {
-//         cout << "Enter Equation of Line in this form : F(x,y) = Ax + By + C = 0 \n";
-//         float A = 0;
-//         float B = 0;
-//         float C = 0;
-//         cout << "A : ";
-//         cin >> A;
-//         cout << "B : ";
-//         cin >> B;
-//         cout << "C : ";
-//         cin >> C;
+void Shape ::reflection()
+{
+    drawAxis();
+    Matrix pZ = getProjectionZ();
+    double pi = 4 * atan(1);
+    float theta = 15 * (pi / 180);
+    float phi = 30 * (pi / 180);
+    char heading[] = "";
 
-//         // About x-axis with some translation
-//         if ((A != 0) && (B == 0) && (C != 0))
-//         {
-//             // Line about which the reflection will be performed
-//             Matrix *reflectionLine = new Matrix(2, 3);
-//             reflectionLine->m[0][0] = 0;
-//             reflectionLine->m[0][1] = getmaxy();
-//             reflectionLine->m[0][2] = 1;
-//             reflectionLine->m[1][0] = 0;
-//             reflectionLine->m[1][1] = -getmaxy();
-//             reflectionLine->m[1][2] = 1;
+    cout << "REFLECTION \n"
+         << "1. about xy-plane \n"
+         << "2. about yz-plane \n"
+         << "3. about xz-plane \n"
+         //  << "4. about x = y \n"
+         //  << "5. about x = -y \n"
+         //  << "6. about an arbitary line\n"
+         << "Enter Option : ";
+    int option;
+    cin >> option;
+    switch (option)
+    {
+    case 1:
+    {
+        Matrix reflectionMatrix = getReflectionMatrixAboutXYPlane();
+        Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix;
+        Matrix *requiredMatrixPtr = &requiredMatrix;
+        this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+        setcolor(4);
+        this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+        requiredMatrixPtr = NULL;
+    }
+    break;
+    case 2:
+    {
+        Matrix reflectionMatrix = getReflectionMatrixAboutYZPlane();
+        Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix;
+        Matrix *requiredMatrixPtr = &requiredMatrix;
+        this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+        setcolor(4);
+        this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+        requiredMatrixPtr = NULL;
+    }
+    break;
+    case 3:
+    {
+        Matrix reflectionMatrix = getReflectionMatrixAboutXZPlane();
+        Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix;
+        Matrix *requiredMatrixPtr = &requiredMatrix;
+        this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+        setcolor(4);
+        this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+        requiredMatrixPtr = NULL;
+    }
+    break;
+    // case 4:
+    // {
+    //     Matrix reflectionMatrix = getReflectionMatrixAboutXY();
+    //     Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
+    //     Matrix *requiredMatrixPtr = &requiredMatrix;
+    //     this->drawShape(requiredMatrixPtr);
+    //     requiredMatrixPtr = NULL;
+    // }
+    // break;
+    // case 5:
+    // {
+    //     Matrix reflectionMatrix = getReflectionMatrixAboutX_Y();
+    //     Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
+    //     Matrix *requiredMatrixPtr = &requiredMatrix;
+    //     this->drawShape(requiredMatrixPtr);
+    //     requiredMatrixPtr = NULL;
+    // }
+    // break;
+    // case 6:
+    // {
+    //     cout << "Enter Equation of Line in this form : F(x,y) = Ax + By + C = 0 \n";
+    //     float A = 0;
+    //     float B = 0;
+    //     float C = 0;
+    //     cout << "A : ";
+    //     cin >> A;
+    //     cout << "B : ";
+    //     cin >> B;
+    //     cout << "C : ";
+    //     cin >> C;
 
-//             // Drawing the Reflection Line
-//             Matrix translationMatrix = getTranslationMatrix(C, 0);
-//             Matrix requiredLineMatrix = (*reflectionLine) * translationMatrix;
-//             Matrix *requiredLineMatrixPtr = &requiredLineMatrix;
-//             this->drawShape(requiredLineMatrixPtr);
-//             requiredLineMatrixPtr = NULL;
-//             delete reflectionLine;
+    //     // About x-axis with some translation
+    //     if ((A != 0) && (B == 0) && (C != 0))
+    //     {
+    //         // Line about which the reflection will be performed
+    //         Matrix *reflectionLine = new Matrix(2, 3);
+    //         reflectionLine->m[0][0] = 0;
+    //         reflectionLine->m[0][1] = getmaxy();
+    //         reflectionLine->m[0][2] = 1;
+    //         reflectionLine->m[1][0] = 0;
+    //         reflectionLine->m[1][1] = -getmaxy();
+    //         reflectionLine->m[1][2] = 1;
 
-//             // Drawing the Reflected Figure
-//             Matrix reflectionMatrix = getReflectionMatrixAboutY();
-//             Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix * translationMatrix;
-//             Matrix *requiredMatrixPtr = &requiredMatrix;
-//             this->drawShape(requiredMatrixPtr);
-//             requiredMatrixPtr = NULL;
-//         }
-//         // About y-axis with some translation
-//         else if ((A == 0) && (B != 0) && (C != 0))
-//         {
-//             // Line about which the reflection will be performed
-//             Matrix *reflectionLine = new Matrix(2, 3);
-//             reflectionLine->m[0][0] = getmaxx();
-//             reflectionLine->m[0][1] = 0;
-//             reflectionLine->m[0][2] = 1;
-//             reflectionLine->m[1][0] = -getmaxx();
-//             reflectionLine->m[1][1] = 0;
-//             reflectionLine->m[1][2] = 1;
+    //         // Drawing the Reflection Line
+    //         Matrix translationMatrix = getTranslationMatrix(C, 0);
+    //         Matrix requiredLineMatrix = (*reflectionLine) * translationMatrix;
+    //         Matrix *requiredLineMatrixPtr = &requiredLineMatrix;
+    //         this->drawShape(requiredLineMatrixPtr);
+    //         requiredLineMatrixPtr = NULL;
+    //         delete reflectionLine;
 
-//             // Drawing the Reflection Line
-//             Matrix translationMatrix = getTranslationMatrix(0, C);
-//             Matrix requiredLineMatrix = (*reflectionLine) * translationMatrix;
-//             requiredLineMatrix.display();
-//             Matrix *requiredLineMatrixPtr = &requiredLineMatrix;
-//             this->drawShape(requiredLineMatrixPtr);
-//             requiredLineMatrixPtr = NULL;
-//             delete reflectionLine;
+    //         // Drawing the Reflected Figure
+    //         Matrix reflectionMatrix = getReflectionMatrixAboutY();
+    //         Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix * translationMatrix;
+    //         Matrix *requiredMatrixPtr = &requiredMatrix;
+    //         this->drawShape(requiredMatrixPtr);
+    //         requiredMatrixPtr = NULL;
+    //     }
+    //     // About y-axis with some translation
+    //     else if ((A == 0) && (B != 0) && (C != 0))
+    //     {
+    //         // Line about which the reflection will be performed
+    //         Matrix *reflectionLine = new Matrix(2, 3);
+    //         reflectionLine->m[0][0] = getmaxx();
+    //         reflectionLine->m[0][1] = 0;
+    //         reflectionLine->m[0][2] = 1;
+    //         reflectionLine->m[1][0] = -getmaxx();
+    //         reflectionLine->m[1][1] = 0;
+    //         reflectionLine->m[1][2] = 1;
 
-//             // Drawing the Reflected Figure
-//             Matrix reflectionMatrix = getReflectionMatrixAboutX();
-//             Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix * translationMatrix;
-//             Matrix *requiredMatrixPtr = &requiredMatrix;
-//             this->drawShape(requiredMatrixPtr);
-//             requiredMatrixPtr = NULL;
-//         }
-//         else
-//         {
-//             // Arbitary Line Parameters
-//             float slope = (-A) / (B);
-//             float y_intercept = (-C) / (B);
-//             float x_intercept = (-C) / (A);
-//             float theta = atan(slope);
-//             cout << "Slope : " << slope << "\n";
-//             cout << "x_intercept : " << x_intercept << "\n";
-//             cout << "y_intercept : " << y_intercept << "\n";
-//             cout << "theta : " << theta << "\n";
+    //         // Drawing the Reflection Line
+    //         Matrix translationMatrix = getTranslationMatrix(0, C);
+    //         Matrix requiredLineMatrix = (*reflectionLine) * translationMatrix;
+    //         requiredLineMatrix.display();
+    //         Matrix *requiredLineMatrixPtr = &requiredLineMatrix;
+    //         this->drawShape(requiredLineMatrixPtr);
+    //         requiredLineMatrixPtr = NULL;
+    //         delete reflectionLine;
 
-//             // Drawing the Reflection Line
-//             float x1 = getmaxx();
-//             float y1 = slope * x1 + y_intercept;
-//             float y2 = getmaxy();
-//             float x2 = (y2 - y_intercept) / slope;
-//             float x3 = -1 * getmaxx();
-//             float y3 = slope * x3 + y_intercept;
-//             float y4 = -1 * getmaxy();
-//             float x4 = (y4 - y_intercept) / slope;
-//             Matrix *reflectionLine = new Matrix(4, 3);
-//             reflectionLine->m[0][0] = x1;
-//             reflectionLine->m[0][1] = y1;
-//             reflectionLine->m[1][0] = x2;
-//             reflectionLine->m[1][1] = y2;
-//             reflectionLine->m[2][0] = x3;
-//             reflectionLine->m[2][1] = y3;
-//             reflectionLine->m[3][0] = x4;
-//             reflectionLine->m[3][1] = y4;
-//             this->drawShape(reflectionLine);
-//             delete reflectionLine;
+    //         // Drawing the Reflected Figure
+    //         Matrix reflectionMatrix = getReflectionMatrixAboutX();
+    //         Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix * translationMatrix;
+    //         Matrix *requiredMatrixPtr = &requiredMatrix;
+    //         this->drawShape(requiredMatrixPtr);
+    //         requiredMatrixPtr = NULL;
+    //     }
+    //     else
+    //     {
+    //         // Arbitary Line Parameters
+    //         float slope = (-A) / (B);
+    //         float y_intercept = (-C) / (B);
+    //         float x_intercept = (-C) / (A);
+    //         float theta = atan(slope);
+    //         cout << "Slope : " << slope << "\n";
+    //         cout << "x_intercept : " << x_intercept << "\n";
+    //         cout << "y_intercept : " << y_intercept << "\n";
+    //         cout << "theta : " << theta << "\n";
 
-//             // Translate the line to Origin
-//             Matrix translateMat = getTranslationMatrix(0, y_intercept);
-//             // Rotate the line to coincide with x-axis
-//             Matrix rotationMatrix = getRotationMatrixClockwise(theta);
-//             // Reflection about x-axis
-//             Matrix reflectionMatrix = getReflectionMatrixAboutX();
-//             // Rotate the line to coincide with x-axis
-//             Matrix rotationMatrixInverse = rotationMatrix.transpose();
-//             // Re-translate to original point
-//             Matrix translateMatInverse = getTranslationMatrix(0, -y_intercept);
-//             // Composition Matrix
-//             Matrix compositionMatrix = translateMat * rotationMatrix * reflectionMatrix * rotationMatrixInverse * translateMatInverse;
-//             Matrix requiredMatrix = (*(this->coOrdinates)) * (compositionMatrix);
-//             Matrix *requiredMatrixPtr = &requiredMatrix;
-//             this->drawShape(requiredMatrixPtr);
-//             requiredMatrixPtr = NULL;
-//         }
-//     }
-//     break;
-//     default:
-//     {
-//         cout << "INVALID\n";
-//     }
-//         return;
-//     }
-// }
+    //         // Drawing the Reflection Line
+    //         float x1 = getmaxx();
+    //         float y1 = slope * x1 + y_intercept;
+    //         float y2 = getmaxy();
+    //         float x2 = (y2 - y_intercept) / slope;
+    //         float x3 = -1 * getmaxx();
+    //         float y3 = slope * x3 + y_intercept;
+    //         float y4 = -1 * getmaxy();
+    //         float x4 = (y4 - y_intercept) / slope;
+    //         Matrix *reflectionLine = new Matrix(4, 3);
+    //         reflectionLine->m[0][0] = x1;
+    //         reflectionLine->m[0][1] = y1;
+    //         reflectionLine->m[1][0] = x2;
+    //         reflectionLine->m[1][1] = y2;
+    //         reflectionLine->m[2][0] = x3;
+    //         reflectionLine->m[2][1] = y3;
+    //         reflectionLine->m[3][0] = x4;
+    //         reflectionLine->m[3][1] = y4;
+    //         this->drawShape(reflectionLine);
+    //         delete reflectionLine;
 
-// // To show Shearing Demonstration
+    //         // Translate the line to Origin
+    //         Matrix translateMat = getTranslationMatrix(0, y_intercept);
+    //         // Rotate the line to coincide with x-axis
+    //         Matrix rotationMatrix = getRotationMatrixClockwise(theta);
+    //         // Reflection about x-axis
+    //         Matrix reflectionMatrix = getReflectionMatrixAboutX();
+    //         // Rotate the line to coincide with x-axis
+    //         Matrix rotationMatrixInverse = rotationMatrix.transpose();
+    //         // Re-translate to original point
+    //         Matrix translateMatInverse = getTranslationMatrix(0, -y_intercept);
+    //         // Composition Matrix
+    //         Matrix compositionMatrix = translateMat * rotationMatrix * reflectionMatrix * rotationMatrixInverse * translateMatInverse;
+    //         Matrix requiredMatrix = (*(this->coOrdinates)) * (compositionMatrix);
+    //         Matrix *requiredMatrixPtr = &requiredMatrix;
+    //         this->drawShape(requiredMatrixPtr);
+    //         requiredMatrixPtr = NULL;
+    //     }
+    // }
+    // break;
+    default:
+    {
+        cout << "INVALID\n";
+    }
+        return;
+    }
+    setcolor(15);
+    system("pause");
+    cleardevice();
+}
+
+// To show Shearing Demonstration
 // void Shape ::shearing()
 // {
 //     cout << "SHEARING \n"
@@ -927,7 +944,9 @@ void Shape::scaling()
 //         Matrix shearingMatrix = getShearingMatrix(shearingX, 0);
 //         Matrix requiredMatrix = (*(this->coOrdinates)) * (shearingMatrix);
 //         Matrix *requiredMatrixPtr = &requiredMatrix;
-//         this->drawShape(requiredMatrixPtr);
+//         this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+//         setcolor(4);
+//         this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
 //         requiredMatrixPtr = NULL;
 //     }
 //     break;
@@ -938,7 +957,9 @@ void Shape::scaling()
 //         Matrix shearingMatrix = getShearingMatrix(0, shearingY);
 //         Matrix requiredMatrix = (*(this->coOrdinates)) * (shearingMatrix);
 //         Matrix *requiredMatrixPtr = &requiredMatrix;
-//         this->drawShape(requiredMatrixPtr);
+//         this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+//         setcolor(4);
+//         this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
 //         requiredMatrixPtr = NULL;
 //     }
 //     break;
@@ -951,7 +972,9 @@ void Shape::scaling()
 //         Matrix shearingMatrix = getShearingMatrix(shearingX, shearingY);
 //         Matrix requiredMatrix = (*(this->coOrdinates)) * (shearingMatrix);
 //         Matrix *requiredMatrixPtr = &requiredMatrix;
-//         this->drawShape(requiredMatrixPtr);
+//         this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+//         setcolor(4);
+//         this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
 //         requiredMatrixPtr = NULL;
 //     }
 //     break;
@@ -963,117 +986,159 @@ void Shape::scaling()
 //     }
 // }
 
-// // To show Rotation Demonstration
-// void Shape ::rotation()
-// {
-//     cout << "ROTATION \n"
-//          << "1. Counter Clockwise about Origin \n"
-//          << "2. Clockwise about Origin \n"
-//          << "3. Counter Clockwise about an arbitary point\n"
-//          << "4. Clockwise about an arbitary point\n"
-//          << "Enter Option : ";
-//     int option;
-//     cin >> option;
-//     double pi = 4 * atan(1);
-//     float theta = 0;
-//     switch (option)
-//     {
-//     case 1:
-//     {
-//         cout << "Enter Angle : ";
-//         cin >> theta;
-//         theta *= (pi / 180);
-//         Matrix rotationMatrix = getRotationMatrixCounterClockwise(theta);
-//         Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix);
-//         Matrix *requiredMatrixPtr = &requiredMatrix;
-//         this->drawShape(requiredMatrixPtr);
-//         requiredMatrixPtr = NULL;
-//     }
-//     break;
-//     case 2:
-//     {
-//         cout << "Enter Angle : ";
-//         cin >> theta;
-//         theta *= (pi / 180);
-//         Matrix rotationMatrix = getRotationMatrixClockwise(theta);
-//         Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix);
-//         Matrix *requiredMatrixPtr = &requiredMatrix;
-//         this->drawShape(requiredMatrixPtr);
-//         requiredMatrixPtr = NULL;
-//     }
-//     break;
-//     case 3:
-//     {
-//         cout << "Enter Angle : ";
-//         cin >> theta;
-//         theta *= (pi / 180);
-//         float x, y;
-//         cout << "Enter Co-Ordinates of the Points \n";
-//         cout << "x : ";
-//         cin >> x;
-//         cout << "y : ";
-//         cin >> y;
-//         // Plotting the arbitary Co-Ordinate
-//         putpixel((x + (getmaxx() / 2)), ((-1 * y) + (getmaxy() / 2)), 3);
-//         Matrix T = getTranslationMatrix(x, y);
-//         Matrix R = getRotationMatrixCounterClockwise(theta);
-//         Matrix T_inverse = getTranslationMatrix(-x, -y);
-//         Matrix requiredMatrix = (*(this->coOrdinates)) * T * R * T_inverse;
-//         Matrix *requiredMatrixPtr = &requiredMatrix;
-//         this->drawShape(requiredMatrixPtr);
-//         requiredMatrixPtr = NULL;
-//     }
-//     break;
-//     case 4:
-//     {
-//         cout << "Enter Angle : ";
-//         cin >> theta;
-//         theta *= (pi / 180);
-//         int x, y;
-//         cout << "Enter Co-Ordinates of the Points \n";
-//         cout << "x : ";
-//         cin >> x;
-//         cout << "y : ";
-//         cin >> y;
-//         // Plotting the arbitary Co-Ordinate
-//         putpixel((x + (getmaxx() / 2)), ((-1 * y) + (getmaxy() / 2)), 3);
-//         Matrix T = getTranslationMatrix(x, y);
-//         Matrix R = getRotationMatrixClockwise(theta);
-//         Matrix T_inverse = getTranslationMatrix(-x, -y);
-//         Matrix requiredMatrix = (*(this->coOrdinates)) * T * R * T_inverse;
-//         Matrix *requiredMatrixPtr = &requiredMatrix;
-//         cout << requiredMatrixPtr << "\n";
-//         this->drawShape(requiredMatrixPtr);
-//         requiredMatrixPtr = NULL;
-//     }
-//     break;
+// To show Rotation Demonstration
+void Shape ::rotation()
+{
+    drawAxis();
+    Matrix pZ = getProjectionZ();
+    double pi = 4 * atan(1);
+    float theta = 15 * (pi / 180);
+    float phi = 30 * (pi / 180);
+    char heading[] = "";
 
-//     default:
-//     {
-//         cout << "INVALID\n";
-//     }
-//         return;
-//     }
-// }
+    cout << "ROTATION \n"
+         << "1. Counter Clockwise about x-axis \n"
+         << "2. Counter Clockwise about y-axis \n"
+         << "3. Counter Clockwise about z-axis \n"
+         //  << "2. Clockwise about Origin \n"
+         //  << "3. Counter Clockwise about an arbitary point\n"
+         //  << "4. Clockwise about an arbitary point\n"
+         << "Enter Option : ";
+    int option;
+    cin >> option;
+    float ita = 0;
+    switch (option)
+    {
+    case 1:
+    {
+        cout << "Enter Angle : ";
+        cin >> ita;
+        ita *= (pi / 180);
+        Matrix rotationMatrix = getRotationMatrixCounterClockwiseX(ita);
+        Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix);
+        Matrix *requiredMatrixPtr = &requiredMatrix;
+        this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+        setcolor(4);
+        this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+        requiredMatrixPtr = NULL;
+    }
+    break;
+    case 2:
+    {
+        cout << "Enter Angle : ";
+        cin >> ita;
+        ita *= (pi / 180);
+        Matrix rotationMatrix = getRotationMatrixCounterClockwiseY(ita);
+        Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix);
+        Matrix *requiredMatrixPtr = &requiredMatrix;
+        this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+        setcolor(4);
+        this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+        requiredMatrixPtr = NULL;
+    }
+    break;
+    case 3:
+    {
+        cout << "Enter Angle : ";
+        cin >> ita;
+        ita *= (pi / 180);
+        Matrix rotationMatrix = getRotationMatrixCounterClockwiseZ(ita);
+        Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix);
+        Matrix *requiredMatrixPtr = &requiredMatrix;
+        this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+        setcolor(4);
+        this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+        requiredMatrixPtr = NULL;
+    }
+    break;
+        // case 4:
+        // {
+        //     cout << "Enter Angle : ";
+        //     cin >> theta;
+        //     theta *= (pi / 180);
+        //     float x, y;
+        //     cout << "Enter Co-Ordinates of the Points \n";
+        //     cout << "x : ";
+        //     cin >> x;
+        //     cout << "y : ";
+        //     cin >> y;
+        //     // Plotting the arbitary Co-Ordinate
+        //     putpixel((x + (getmaxx() / 2)), ((-1 * y) + (getmaxy() / 2)), 3);
+        //     Matrix T = getTranslationMatrix(x, y);
+        //     Matrix R = getRotationMatrixCounterClockwise(theta);
+        //     Matrix T_inverse = getTranslationMatrix(-x, -y);
+        //     Matrix requiredMatrix = (*(this->coOrdinates)) * T * R * T_inverse;
+        //     Matrix *requiredMatrixPtr = &requiredMatrix;
+        //     this->drawShape(requiredMatrixPtr);
+        //     requiredMatrixPtr = NULL;
+        // }
+        // break;
+        // case 4:
+        // {
+        //     cout << "Enter Angle : ";
+        //     cin >> theta;
+        //     theta *= (pi / 180);
+        //     int x, y;
+        //     cout << "Enter Co-Ordinates of the Points \n";
+        //     cout << "x : ";
+        //     cin >> x;
+        //     cout << "y : ";
+        //     cin >> y;
+        //     // Plotting the arbitary Co-Ordinate
+        //     putpixel((x + (getmaxx() / 2)), ((-1 * y) + (getmaxy() / 2)), 3);
+        //     Matrix T = getTranslationMatrix(x, y);
+        //     Matrix R = getRotationMatrixClockwise(theta);
+        //     Matrix T_inverse = getTranslationMatrix(-x, -y);
+        //     Matrix requiredMatrix = (*(this->coOrdinates)) * T * R * T_inverse;
+        //     Matrix *requiredMatrixPtr = &requiredMatrix;
+        //     cout << requiredMatrixPtr << "\n";
+        //     this->drawShape(requiredMatrixPtr);
+        //     requiredMatrixPtr = NULL;
+        // }
+        // break;
+
+    default:
+    {
+        cout << "INVALID\n";
+    }
+        return;
+    }
+    system("pause");
+    cleardevice();
+    setcolor(15);
+}
 
 // // To show Translation Demonstration
-// void Shape::translation()
-// {
-//     cout << "TRANSLATION \n";
-//     float xFactor = 0;
-//     float yFactor = 0;
-//     cout << "Translate x co-ordinate by : ";
-//     cin >> xFactor;
-//     cout << "Translate y co-ordinate by : ";
-//     cin >> yFactor;
-//     Matrix translationMatrix = getTranslationMatrix(xFactor, yFactor);
-//     Matrix requiredMatrix = (*(this->coOrdinates)) * (translationMatrix);
-//     Matrix *requiredMatrixPtr = &requiredMatrix;
-//     this->drawShape(requiredMatrixPtr);
-//     requiredMatrixPtr = NULL;
-// }
+void Shape::translation()
+{
 
-// // To show Translation Demonstration
+    drawAxis();
+    Matrix pZ = getProjectionZ();
+    double pi = 4 * atan(1);
+    float theta = 15 * (pi / 180);
+    float phi = 30 * (pi / 180);
+    char heading[] = "";
+
+    cout << "TRANSLATION \n";
+    float xFactor = 0;
+    float yFactor = 0;
+    float zFactor = 0;
+    cout << "Translate x co-ordinate by : ";
+    cin >> xFactor;
+    cout << "Translate y co-ordinate by : ";
+    cin >> yFactor;
+    cout << "Translate z co-ordinate by : ";
+    cin >> zFactor;
+    Matrix translationMatrix = getTranslationMatrix(xFactor, yFactor, zFactor);
+    Matrix requiredMatrix = (*(this->coOrdinates)) * (translationMatrix);
+    Matrix *requiredMatrixPtr = &requiredMatrix;
+    this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+    setcolor(4);
+    this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+    requiredMatrixPtr = NULL;
+}
+
+// To show Translation Demonstration
 // void Shape ::transformationMatrix()
 // {
 //     Matrix transformationMat(3, 3);

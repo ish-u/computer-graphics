@@ -22,12 +22,14 @@ int main()
     line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
     line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
 
-    shape->orthographicProjection(shape->coOrdinates);
-    shape->axonometricProjection(shape->coOrdinates);
-    shape->prespectiveProjection(shape->coOrdinates);
+    // shape->orthographicProjection(shape->coOrdinates);
+    // shape->axonometricProjection(shape->coOrdinates);
+    // shape->prespectiveProjection(shape->coOrdinates);
     shape->animation(shape->coOrdinates);
     // shape->axisAnimation(shape->coOrdinates);
-
+    // shape->scaling();
+    // shape->reflection();
+    // shape->rotation();
     // Menu
     // int flag = 1;
     // int option = 0;
@@ -38,9 +40,8 @@ int main()
     //     line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
     //     line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
     //     // Drawing the Shape
-    //     shape->drawShape((shape->coOrdinates));
+    //     // shape->drawShape((shape->coOrdinates));
 
-    //     setcolor(12);
     //     cout << "Choose Option\n"
     //          << "1. Scaling\n"
     //          << "2. Shearing\n"
@@ -57,9 +58,9 @@ int main()
     //     case 1:
     //         shape->scaling();
     //         break;
-    //     case 2:
-    //         shape->shearing();
-    //         break;
+    //     // case 2:
+    //     //     shape->shearing();
+    //     //     break;
     //     case 3:
     //         shape->reflection();
     //         break;
@@ -69,9 +70,9 @@ int main()
     //     case 5:
     //         shape->translation();
     //         break;
-    //     case 6:
-    //         shape->transformationMatrix();
-    //         break;
+    //     // case 6:
+    //     //     shape->transformationMatrix();
+    //     //     break;
     //     case 7:
     //         flag = 0;
     //         cout << "EXITING\n";
