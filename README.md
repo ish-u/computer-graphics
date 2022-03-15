@@ -2,6 +2,10 @@
 
 Code for Computer Graphics Practical for [BSc.(H) Computer Science](<http://www.du.ac.in/du/uploads/RevisedSyllabi1/Annexure-83.%20(BSc(H)-Computer%20Science).pdf>)
 
+<p align="center">
+<img center src="./cube.gif" height="300">
+</p>
+
 ### Set Up `<graphics.h>`
 
 - Dowload and Install the **`32-bit`** GCC Compiler from [this link](https://jmeubank.github.io/tdm-gcc/download/)
