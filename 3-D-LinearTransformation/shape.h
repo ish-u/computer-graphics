@@ -4,10 +4,50 @@
 #include "matrix.h"
 using namespace std;
 
-void drawAxis()
+void drawAxis(float theta = 15 * (3.14159265359 / 180), float phi = 30 * (3.14159265359 / 180))
 {
-    line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
-    line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
+    // line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
+    // line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
+    float pi = 4 * atanf(1);
+    // float theta = 15 * (pi / 180);
+    // float phi = 30 * (pi / 180);
+    Matrix *Lines = new Matrix(6, 4);
+    Lines->m[0][0] = 2000;
+    Lines->m[0][1] = 0;
+    Lines->m[0][2] = 0;
+
+    Lines->m[1][0] = 0;
+    Lines->m[1][1] = 2000;
+    Lines->m[1][2] = 0;
+
+    Lines->m[2][0] = 0;
+    Lines->m[2][1] = 0;
+    Lines->m[2][2] = 2000;
+
+    Lines->m[3][0] = -2000,
+    Lines->m[3][1] = 0;
+    Lines->m[3][2] = 0;
+
+    Lines->m[4][0] = 0;
+    Lines->m[4][1] = -2000;
+    Lines->m[4][2] = 0;
+
+    Lines->m[5][0] = 0,
+    Lines->m[5][1] = 0;
+    Lines->m[5][2] = -2000;
+
+    Matrix pZ = getProjectionZ();
+
+    Matrix rotateX = getRotationMatrixCounterClockwiseX(theta);
+    Matrix rotateY = getRotationMatrixCounterClockwiseY(phi);
+    Matrix requiredMatrix = (*(Lines)) * rotateY * rotateX * pZ;
+    // requiredMatrix.display();
+    for (int i = 0; i < Lines->r; i++)
+    {
+        line(getmaxx() / 2, getmaxy() / 2, requiredMatrix.m[i][0] + (getmaxx() / 2), -1 * requiredMatrix.m[i][1] + (getmaxy() / 2));
+    }
+
+    delete Lines;
 }
 
 // Shape Class
@@ -15,11 +55,6 @@ class Shape
 {
 
 public:
-    // Data Memebers
-    Matrix *coOrdinates;
-    int numberOfCoOrdinates = 0;
-    int numberOfFaces = 0;
-    Matrix *faces;
     // Constructor
     Shape()
     {
@@ -160,25 +195,42 @@ public:
         delete this->faces;
     }
     // member function
-    void drawShape(Matrix *matrix);
-    void sortCoOrdinates(int *poly, int numberOfCoOrdinates);
-    void convertToHomogenous(Matrix *matrix);
     void scaling();
     void reflection();
     void shearing();
     void rotation();
     void translation();
     void transformationMatrix();
-    float *getCentroid(Matrix *m);
-    void drawOrthographicProjection(Matrix *m, float theta, float phi, float ita, char *heading);
-    void orthographicProjection(Matrix *m);
-    void drawAxonometricProjection(Matrix *m, float theta, float phi, char *heading);
-    void axonometricProjection(Matrix *m);
-    void drawPrespectiveProjection(Matrix *m, float p, float q, float r, char *heading);
-    void prespectiveProjection(Matrix *m);
-    void axisAnimation(Matrix *m);
-    void animation(Matrix *matrix);
+    void projectionDemo();
+
+private:
+    // Data Memebers
+    Matrix *coOrdinates;
+    int numberOfCoOrdinates = 0;
+    int numberOfFaces = 0;
+    Matrix *faces;
+    // Member Functions
+    void drawShape(Matrix *coOrdinates);
+    void sortCoOrdinates(int *poly, int numberOfCoOrdinates);
+    void convertToHomogenous(Matrix *coOrdinates);
+    float *getCentroid(Matrix *coOrdinates);
+    void drawOrthographicProjection(Matrix *coOrdinates, float theta, float phi, float ita, char *heading);
+    void orthographicProjection(Matrix *coOrdinates);
+    void drawAxonometricProjection(Matrix *coOrdinates, float theta, float phi, char *heading);
+    void axonometricProjection(Matrix *coOrdinates);
+    void drawPrespectiveProjection(Matrix *coOrdinates, float p, float q, float r, char *heading);
+    void prespectiveProjection(Matrix *coOrdinates);
+    void axisAnimation(Matrix *coOrdinates);
+    void animation(Matrix *coOrdinates);
 };
+
+void Shape ::projectionDemo()
+{
+    this->axisAnimation(this->coOrdinates);
+    this->axonometricProjection(this->coOrdinates);
+    this->orthographicProjection(this->coOrdinates);
+    this->prespectiveProjection(this->coOrdinates);
+}
 
 void Shape ::animation(Matrix *matrix)
 {
@@ -199,7 +251,7 @@ void Shape ::animation(Matrix *matrix)
 
         sprintf(text, "Rotation Angles");
         outtextxy(20, 20, text);
-        drawAxis();
+        drawAxis(theta, phi);
         sprintf(text, "theta : %f \t", fmod((theta * 180 / pi), threeSixty));
         outtextxy(20, 40, text);
         sprintf(text, "phi : %f", fmod((phi * 180 / pi), threeSixty));
@@ -225,6 +277,12 @@ void Shape::drawShape(Matrix *matrix)
 {
     float **coOrdinates = matrix->m;
     int numberOfCoOrdinates = matrix->r;
+
+    if (numberOfCoOrdinates != this->numberOfCoOrdinates)
+    {
+        cout << "BAD \n";
+        return;
+    }
 
     // cout << "\nDRAWN FIGURE HOMOGENOUS CO_ORDINATES\n";
     // cout << "===================================";
@@ -294,7 +352,7 @@ void Shape ::prespectiveProjection(Matrix *m)
         // z -axis
         for (int i = 0; i < 10; i++)
         {
-            drawAxis();
+            drawAxis(0, 0);
             r = -1 * (float)i / 1000;
             this->drawPrespectiveProjection(m, p, q, r, text);
             delay(1000);
@@ -305,7 +363,8 @@ void Shape ::prespectiveProjection(Matrix *m)
         p = q = r = 0;
         for (int i = 0; i < 10; i++)
         {
-            drawAxis();
+            drawAxis(0, 0);
+
             q = -1 * (float)i / 1000;
             this->drawPrespectiveProjection(m, p, q, r, text);
             delay(1000);
@@ -331,7 +390,7 @@ void Shape ::prespectiveProjection(Matrix *m)
         p = q = r = 0;
         for (int i = 0; i < 10; i++)
         {
-            drawAxis();
+            drawAxis(0, 0);
             p = -1 * (float)i / 1000;
             q = -1 * (float)i / 1000;
             this->drawPrespectiveProjection(m, p, q, r, text);
@@ -343,7 +402,7 @@ void Shape ::prespectiveProjection(Matrix *m)
         p = q = r = 0;
         for (int i = 0; i < 10; i++)
         {
-            drawAxis();
+            drawAxis(0, 0);
             p = -1 * (float)i / 1000;
             r = -1 * (float)i / 1000;
             this->drawPrespectiveProjection(m, p, q, r, text);
@@ -355,7 +414,7 @@ void Shape ::prespectiveProjection(Matrix *m)
         p = q = r = 0;
         for (int i = 0; i < 10; i++)
         {
-            drawAxis();
+            drawAxis(0, 0);
             q = -1 * (float)i / 1000;
             r = -1 * (float)i / 1000;
             this->drawPrespectiveProjection(m, p, q, r, text);
@@ -371,7 +430,7 @@ void Shape ::prespectiveProjection(Matrix *m)
 
         for (int i = 0; i < 10; i++)
         {
-            drawAxis();
+            drawAxis(0, 0);
             p = -1 * (float)i / 1000;
             q = -1 * (float)i / 1000;
             r = -1 * (float)i / 1000;
@@ -399,8 +458,7 @@ void Shape::drawAxonometricProjection(Matrix *m, float theta, float phi, char *h
 
     Matrix rotateX = getRotationMatrixCounterClockwiseX(theta);
     Matrix rotateY = getRotationMatrixCounterClockwiseY(phi);
-    Matrix translate = getTranslationMatrix(centroid[0] / 20, centroid[1] / 20, centroid[2] / 20);
-    Matrix requiredMatrix = (*(m)) * T * rotateY * rotateX * T_inv * translate * pZ;
+    Matrix requiredMatrix = (*(m)) * T * rotateY * rotateX * T_inv * pZ;
     Matrix *requiredMatrixPtr = &requiredMatrix;
     this->drawShape(requiredMatrixPtr);
 }
@@ -420,9 +478,9 @@ void Shape::axonometricProjection(Matrix *m)
         for (int j = 15; j <= 45; j += 15)
         {
             // Grid Lines
-            drawAxis();
             theta = i * (pi / 180);
             phi = j * (pi / 180);
+            drawAxis(theta, phi);
             drawAxonometricProjection(m, theta, phi, text);
             delay(1000);
             // system("pause");
@@ -436,10 +494,10 @@ void Shape::axonometricProjection(Matrix *m)
         for (int i = 0; i < 9; i++)
         {
             sprintf(text, "Axonometric -> Dimetric");
-            drawAxis();
             fz = 0.125 * i;
             theta = asin(fz / sqrt(2));
             phi = asin(fz / sqrt(2 - powf(fz, 2)));
+            drawAxis(theta, phi);
             drawAxonometricProjection(m, theta, phi, text);
             sprintf(text, "fz : %f", fz);
             outtextxy(20, 80, text);
@@ -452,33 +510,33 @@ void Shape::axonometricProjection(Matrix *m)
         sprintf(text, "Axonometric -> Isometric");
 
         // (35.26, -45)
-        drawAxis();
         theta = 35.26 * (pi / 180);
         phi = -45 * (pi / 180);
+        drawAxis(theta, phi);
         drawAxonometricProjection(m, theta, phi, text);
         delay(1000);
         cleardevice();
 
         // (-35.26, -45)
-        drawAxis();
         theta = -35.26 * (pi / 180);
         phi = -45 * (pi / 180);
+        drawAxis(theta, phi);
         drawAxonometricProjection(m, theta, phi, text);
         delay(1000);
         cleardevice();
 
         // (35.26, 45)
-        drawAxis();
         theta = 35.26 * (pi / 180);
         phi = 45 * (pi / 180);
+        drawAxis(theta, phi);
         drawAxonometricProjection(m, theta, phi, text);
         delay(1000);
         cleardevice();
 
         // (-35.26, 45)
-        drawAxis();
         theta = -35.26 * (pi / 180);
         phi = 45 * (pi / 180);
+        drawAxis(theta, phi);
         drawAxonometricProjection(m, theta, phi, text);
         delay(1000);
         cleardevice();
@@ -497,7 +555,7 @@ void Shape ::drawOrthographicProjection(Matrix *m, float theta, float phi, float
     Matrix rotateY = getRotationMatrixCounterClockwiseY(phi);
     Matrix rotateZ = getRotationMatrixCounterClockwiseZ(ita);
 
-    drawAxis();
+    drawAxis(0, 0);
     outtextxy(20, 20, heading);
 
     Matrix face = (*(m)) * T * rotateX * rotateY * rotateZ * T_inv * pZ;
@@ -581,6 +639,7 @@ void Shape ::axisAnimation(Matrix *m)
         outtextxy(20, 20, text);
         sprintf(text, "%d", i);
         outtextxy(20, 40, text);
+        drawAxis(theta, 0);
 
         Matrix rotateX = getRotationMatrixCounterClockwiseX(theta);
         Matrix Top = (*(m)) * T * rotateX * T_inv * pZ;
@@ -602,6 +661,8 @@ void Shape ::axisAnimation(Matrix *m)
         sprintf(text, "%d", i);
         outtextxy(20, 40, text);
 
+        drawAxis(0, theta);
+
         Matrix rotateY = getRotationMatrixCounterClockwiseY(theta);
         Matrix Right = (*(m)) * T * rotateY * T_inv * pZ;
         Matrix *requiredMatrixPtr = &Right;
@@ -621,6 +682,8 @@ void Shape ::axisAnimation(Matrix *m)
         outtextxy(20, 20, text);
         sprintf(text, "%d", i);
         outtextxy(20, 40, text);
+
+        drawAxis(0, 0);
 
         Matrix rotateZ = getRotationMatrixCounterClockwiseZ(theta);
         Matrix requiredMatrix = (*(m)) * T * rotateZ * T_inv * (pZ);
@@ -673,6 +736,11 @@ float *Shape ::getCentroid(Matrix *coOrdinates)
 // To show Scaling Demonstration
 void Shape::scaling()
 {
+    double pi = 4 * atan(1);
+    float theta = 15 * (pi / 180);
+    float phi = 30 * (pi / 180);
+    char heading[] = "";
+    drawAxis();
     cout << "SCALING\n"
          << "1. Uniform Scaling \n"
          << "2. Non-Uniform Scaling \n"
@@ -715,18 +783,21 @@ void Shape::scaling()
     Matrix requiredMatrix = (*(this->coOrdinates)) * (scaleMatrix);
     Matrix *requiredMatrixPtr = &requiredMatrix;
     // this->orthographicProjection(requiredMatrixPtr);
-    this->animation(requiredMatrixPtr);
+    // this->animation(requiredMatrixPtr);
+    this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+    setcolor(4);
+    this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
     requiredMatrixPtr = NULL;
 }
 
 // To show Reflection Demonstration
 void Shape ::reflection()
 {
-    drawAxis();
     Matrix pZ = getProjectionZ();
     double pi = 4 * atan(1);
     float theta = 15 * (pi / 180);
     float phi = 30 * (pi / 180);
+    // drawAxis(theta, phi);
     char heading[] = "";
 
     cout << "REFLECTION \n"
@@ -743,35 +814,97 @@ void Shape ::reflection()
     {
     case 1:
     {
-        Matrix reflectionMatrix = getReflectionMatrixAboutXYPlane();
-        Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix;
-        Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
-        setcolor(4);
-        this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
-        requiredMatrixPtr = NULL;
+        for (int i = 0; i <= 90; i += 15)
+        {
+            for (int j = 0; j <= 45; j += 15)
+            {
+                // Grid Lines
+                theta = i * (pi / 180);
+                phi = j * (pi / 180);
+                drawAxis(theta, phi);
+                // drawAxonometricProjection(m, theta, phi, text);
+                Matrix reflectionMatrix = getReflectionMatrixAboutXYPlane();
+                Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix;
+                Matrix *requiredMatrixPtr = &requiredMatrix;
+                this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+                this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+
+                system("pause");
+                cleardevice();
+                requiredMatrixPtr = NULL;
+            }
+        }
+
+        // Matrix reflectionMatrix = getReflectionMatrixAboutXYPlane();
+        // Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix;
+        // Matrix *requiredMatrixPtr = &requiredMatrix;
+        // this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+        // setcolor(4);
+        // this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+        // requiredMatrixPtr = NULL;
     }
     break;
     case 2:
     {
-        Matrix reflectionMatrix = getReflectionMatrixAboutYZPlane();
-        Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix;
-        Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
-        setcolor(4);
-        this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
-        requiredMatrixPtr = NULL;
+        for (int i = 0; i <= 90; i += 15)
+        {
+            for (int j = 0; j <= 45; j += 15)
+            {
+                // Grid Lines
+                theta = i * (pi / 180);
+                phi = j * (pi / 180);
+                drawAxis(theta, phi);
+                // drawAxonometricProjection(m, theta, phi, text);
+                Matrix reflectionMatrix = getReflectionMatrixAboutYZPlane();
+                Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix;
+                Matrix *requiredMatrixPtr = &requiredMatrix;
+                this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+                this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+
+                system("pause");
+                cleardevice();
+                requiredMatrixPtr = NULL;
+            }
+        }
+        // Matrix reflectionMatrix = getReflectionMatrixAboutYZPlane();
+        // Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix;
+        // Matrix *requiredMatrixPtr = &requiredMatrix;
+        // this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+        // setcolor(4);
+        // this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+        // requiredMatrixPtr = NULL;
     }
     break;
     case 3:
     {
-        Matrix reflectionMatrix = getReflectionMatrixAboutXZPlane();
-        Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix;
-        Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
-        setcolor(4);
-        this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
-        requiredMatrixPtr = NULL;
+        for (int i = 0; i <= 90; i += 15)
+        {
+            for (int j = 0; j <= 45; j += 15)
+            {
+                // Grid Lines
+                theta = i * (pi / 180);
+                phi = j * (pi / 180);
+                drawAxis(theta, phi);
+                // drawAxonometricProjection(m, theta, phi, text);
+                Matrix reflectionMatrix = getReflectionMatrixAboutXZPlane();
+                Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix;
+                Matrix *requiredMatrixPtr = &requiredMatrix;
+                this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+                this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+
+                // delay(1000);
+                system("pause");
+                cleardevice();
+                requiredMatrixPtr = NULL;
+            }
+        }
+        // Matrix reflectionMatrix = getReflectionMatrixAboutXZPlane();
+        // Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix;
+        // Matrix *requiredMatrixPtr = &requiredMatrix;
+        // this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+        // setcolor(4);
+        // this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+        // requiredMatrixPtr = NULL;
     }
     break;
     // case 4:
@@ -989,11 +1122,11 @@ void Shape ::reflection()
 // To show Rotation Demonstration
 void Shape ::rotation()
 {
-    drawAxis();
     Matrix pZ = getProjectionZ();
     double pi = 4 * atan(1);
-    float theta = 15 * (pi / 180);
-    float phi = 30 * (pi / 180);
+    float theta = 0 * (pi / 180);
+    float phi = 90 * (pi / 180);
+    drawAxis(theta, phi);
     char heading[] = "";
 
     cout << "ROTATION \n"
@@ -1011,44 +1144,65 @@ void Shape ::rotation()
     {
     case 1:
     {
-        cout << "Enter Angle : ";
-        cin >> ita;
-        ita *= (pi / 180);
-        Matrix rotationMatrix = getRotationMatrixCounterClockwiseX(ita);
-        Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix);
-        Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
-        setcolor(4);
-        this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
-        requiredMatrixPtr = NULL;
+        for (int i = 0; i < 360; i += 10)
+        {
+
+            // cout << "Enter Angle : ";
+            // cin >> ita;
+            ita = i;
+            ita *= (pi / 180);
+            Matrix rotationMatrix = getRotationMatrixCounterClockwiseX(ita);
+            Matrix rotationMatriY = getRotationMatrixCounterClockwiseY(phi);
+            Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix)*rotationMatriY;
+            Matrix *requiredMatrixPtr = &requiredMatrix;
+            this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+            setcolor(4);
+            this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+            requiredMatrixPtr = NULL;
+            delay(1000);
+        }
     }
     break;
     case 2:
     {
-        cout << "Enter Angle : ";
-        cin >> ita;
-        ita *= (pi / 180);
-        Matrix rotationMatrix = getRotationMatrixCounterClockwiseY(ita);
-        Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix);
-        Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
-        setcolor(4);
-        this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
-        requiredMatrixPtr = NULL;
+        for (int i = 0; i < 360; i += 10)
+        {
+
+            // cout << "Enter Angle : ";
+            // cin >> ita;
+            ita = i;
+            ita *= (pi / 180);
+            Matrix rotationMatrix = getRotationMatrixCounterClockwiseY(ita);
+            Matrix rotationMatrixX = getRotationMatrixCounterClockwiseX(phi);
+            Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix)*rotationMatrixX;
+            Matrix *requiredMatrixPtr = &requiredMatrix;
+            this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+            setcolor(4);
+            this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+            requiredMatrixPtr = NULL;
+            delay(1000);
+        }
     }
     break;
     case 3:
     {
-        cout << "Enter Angle : ";
-        cin >> ita;
-        ita *= (pi / 180);
-        Matrix rotationMatrix = getRotationMatrixCounterClockwiseZ(ita);
-        Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix);
-        Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
-        setcolor(4);
-        this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
-        requiredMatrixPtr = NULL;
+        for (int i = 0; i < 360; i += 10)
+        {
+
+            // cout << "Enter Angle : ";
+            // cin >> ita;
+            ita = i;
+
+            ita *= (pi / 180);
+            Matrix rotationMatrix = getRotationMatrixCounterClockwiseZ(ita);
+            Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix);
+            Matrix *requiredMatrixPtr = &requiredMatrix;
+            this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
+            setcolor(4);
+            this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
+            requiredMatrixPtr = NULL;
+            delay(1000);
+        }
     }
     break;
         // case 4:
@@ -1112,11 +1266,11 @@ void Shape ::rotation()
 void Shape::translation()
 {
 
-    drawAxis();
     Matrix pZ = getProjectionZ();
     double pi = 4 * atan(1);
     float theta = 15 * (pi / 180);
     float phi = 30 * (pi / 180);
+    drawAxis(theta, phi);
     char heading[] = "";
 
     cout << "TRANSLATION \n";
