@@ -161,11 +161,18 @@ Matrix getScaleMatrix(float scaleFactorX, float scaleFactorY, float scaleFactorZ
     return scaleMatrix;
 }
 // SHEARING MATRIX
-Matrix getShearingMatrix(float shearingFactorX, float shearingFactorY)
+Matrix getShearingMatrix(float X1, float X2, float Y1, float Y2, float Z1, float Z2)
 {
-    Matrix shearingMatrix(3, 3);
-    shearingMatrix.m[1][0] = shearingFactorX;
-    shearingMatrix.m[0][1] = shearingFactorY;
+    Matrix shearingMatrix(4, 4);
+    shearingMatrix.m[1][0] = X1;
+    shearingMatrix.m[2][0] = X2;
+
+    shearingMatrix.m[0][1] = Y1;
+    shearingMatrix.m[2][1] = Y2;
+
+    shearingMatrix.m[0][2] = Z1;
+    shearingMatrix.m[1][2] = Y2;
+
     shearingMatrix.display();
     return shearingMatrix;
 }

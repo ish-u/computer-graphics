@@ -9,7 +9,7 @@ int main()
 {
     int gd = DETECT, gm;
     // initgraph(&gd, &gm, NULL);
-    initwindow(800, 600);
+    initwindow(640, 480);
 
     // Polygon
     // cout << "Enter the Number of Co-ordinates : ";
@@ -44,9 +44,9 @@ int main()
         case 1:
             shape->scaling();
             break;
-        // case 2:
-        //     shape->shearing();
-        //     break;
+        case 2:
+            shape->shearing();
+            break;
         case 3:
             shape->reflection();
             break;
