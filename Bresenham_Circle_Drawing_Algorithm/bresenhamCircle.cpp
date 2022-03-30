@@ -3,7 +3,7 @@
 #include <stdlib.h>
 using namespace std;
 
-// Bresenham's Line Drawing Algorithm
+// Bresenham's Circle Drawing Algorithm
 // Taken from  - Computer Graphics Principles and Practice in C - Foley
 // We utilise the 8-way symmetry of the Circle to plot the points using the points of Second Octant - (x,y)
 void plotPoints(int x, int y, int h, int k, int color)
