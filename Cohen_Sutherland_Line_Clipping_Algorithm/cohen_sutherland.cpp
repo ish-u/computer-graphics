@@ -15,7 +15,8 @@ enum
     RIGHT = 4,
     LEFT = 8
 };
-
+// Cohen-Sutherland Line Clipping Algorithm
+// Taken from  - Computer Graphics Principles and Practice in C - Foley
 // Compute the Outcode given the co-ordinates of the points (x,y)
 outcode CompOutCode(double x, double y)
 {
