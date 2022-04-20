@@ -43,6 +43,7 @@ void bresenhamEllipse(int h, int k, int a, int b, int color)
             y--;
         }
         x++;
+        cout << x << "\t" << y << "\t" << d1 << "\n";
         plotPoints(x, y, h, k, color);
     }
 
@@ -60,6 +61,7 @@ void bresenhamEllipse(int h, int k, int a, int b, int color)
             d2 += a * a * (-2 * y + 3); // Select S
         }
         y--;
+        cout << x << "\t" << y << "\t" << d1 << "\n";
         plotPoints(x, y, h, k, color);
     }
 }
@@ -75,12 +77,14 @@ int main()
 
     // Drawing Concentric Circle from 0 to 200 in increment of 10
     int i = 0;
-    while (i < 200)
-    {
-        // Axis
-        bresenhamEllipse(getmaxx() / 2, getmaxy() / 2, 50 + i, 5 + i, rand() % 16 + 1);
-        i += 10;
-    }
+    // while (i < 200)
+    // {
+    //     // Axis
+    //     bresenhamEllipse(getmaxx() / 2, getmaxy() / 2, 50 + i, 5 + i, rand() % 16 + 1);
+    //     i += 10;
+    // }
+
+    bresenhamEllipse(getmaxx() / 2, getmaxy() / 2, 8, 6, rand() % 16 + 1);
 
     getch();
     closegraph();

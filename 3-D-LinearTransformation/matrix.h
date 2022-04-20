@@ -254,3 +254,13 @@ Matrix getPrespectiveProjMatrix(float p, float q, float r)
     prespectiveMatrix.m[2][3] = r;
     return prespectiveMatrix;
 }
+
+// OBLIQUE PROJECTION
+Matrix getObliqueProjMatrix(float alpha, float f)
+{
+    Matrix obliqueMatrix(4, 4);
+    obliqueMatrix.m[2][0] = -f * cos(alpha);
+    obliqueMatrix.m[2][1] = -f * sin(alpha);
+    obliqueMatrix.m[2][2] = 0;
+    return obliqueMatrix;
+}

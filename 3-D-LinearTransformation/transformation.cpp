@@ -2,6 +2,7 @@
 #include <graphics.h>
 #include <math.h>
 
+        // delta *= PI / 180;
 using namespace std;
 #include "shape.h"
 
@@ -9,14 +10,13 @@ int main()
 {
     int gd = DETECT, gm;
     // initgraph(&gd, &gm, NULL);
-    initwindow(640, 480);
+    initwindow(800, 800);
 
-    // Polygon
     // cout << "Enter the Number of Co-ordinates : ";
     // int coOrdinates = 0;
     // cin >> coOrdinates;
     // Shape *shape = new Shape(coOrdinates);
-    // Deafult Constructor that draws a Quadrilateral
+    // Default Constructor that draws a Cube with one cutted corner
     Shape *shape = new Shape();
 
     // Menu
@@ -24,7 +24,6 @@ int main()
     int option = 0;
     do
     {
-        cleardevice();
 
         cout << "Choose Option\n"
              << "1. Scaling\n"
@@ -34,8 +33,11 @@ int main()
              << "5. Translation\n"
              << "6. General Transformation Matrix\n"
              << "7. Object Animation\n"
-             << "8. Projection Demonstration\n"
-             << "9. Exit\n"
+             << "8. Orthographic Projection Demonstration\n"
+             << "9. Axonometric Projection Demonstration\n"
+             << "10. Oblique Projection Demonstration\n"
+             << "11. Prespective Projection Demonstration\n"
+             << "12. Exit\n"
              << " : ";
         cin >> option;
         cout << "\n";
@@ -63,9 +65,18 @@ int main()
             shape->animation();
             break;
         case 8:
-            shape->projectionDemo();
+            shape->orthographicProjectionDemo();
             break;
         case 9:
+            shape->axonometricProjectionDemo();
+            break;
+        case 10:
+            shape->obliqueProjectionDemo();
+            break;
+        case 11:
+            shape->prespectiveProjectionDemo();
+            break;
+        case 12:
             flag = 0;
             cout << "EXITING\n";
             break;
@@ -75,6 +86,7 @@ int main()
         }
         system("pause");
         system("cls");
+        cleardevice();
         setcolor(15);
     } while (flag);
 

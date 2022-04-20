@@ -2,10 +2,10 @@
 #include <graphics.h>
 using namespace std;
 
-const double xmin = 0;
-const double xmax = 450;
-const double ymin = 0;
-const double ymax = 350;
+const double xmin = 50;
+const double xmax = 600;
+const double ymin = 50;
+const double ymax = 430;
 
 typedef unsigned int outcode;
 enum
@@ -45,6 +45,7 @@ outcode CompOutCode(double x, double y)
 // Cohen-Sutherland Line Clipping Algorithm
 void CohenSutherlandLineClipAndDraw(double x0, double y0, double x1, double y1)
 {
+
     // Compute the Outcode of P0(x0,y0) and P1(x1,y1)
     outcode outcode0 = CompOutCode(x0, y0);
     outcode outcode1 = CompOutCode(x1, y1);
@@ -115,17 +116,26 @@ void CohenSutherlandLineClipAndDraw(double x0, double y0, double x1, double y1)
             }
         }
 
-        cout << x0 << ", " << y0 << "\t" << x1 << ", " << y1 << "\t" << outcode0 << "\t" << outcode1 << "\t" << outcodeOut << "\n";
+        // cout << x0 << ", " << y0 << "\t" << x1 << ", " << y1 << "\t" << outcode0 << "\t" << outcode1 << "\t" << outcodeOut << "\n";
 
     } while (done == FALSE);
 
     // Draw the Clipped Line
     if (accept == TRUE)
     {
-        line(x0 + getmaxx() / 6, -1 * y0 + 3 * getmaxy() / 4, x1 + getmaxx() / 6, -1 * y1 + 3 * getmaxy() / 4);
+        line(x0, -1 * y0 + getmaxy(), x1, -1 * y1 + getmaxy());
     }
 
     // cout << x0 << ", " << y0 << "\t" << x1 << ", " << y1 << "\n";
+}
+
+// Draw the Clip Rectangle
+void drawClipRectangle()
+{
+    line(xmin, -1 * ymin + getmaxy(), xmin, -1 * ymax + getmaxy());
+    line(xmin, -1 * ymax + getmaxy(), xmax, -1 * ymax + getmaxy());
+    line(xmax, -1 * ymax + getmaxy(), xmax, -1 * ymin + getmaxy());
+    line(xmax, -1 * ymin + getmaxy(), xmin, -1 * ymin + getmaxy());
 }
 
 int main()
@@ -133,19 +143,28 @@ int main()
     int gd = DETECT, gm;
     initgraph(&gd, &gm, NULL);
 
-    // Drawing the Axis
-    setcolor(1);
-    // draw the clip rectangle
-    setcolor(15);
-    line(xmin + getmaxx() / 6, -1 * ymin + 3 * getmaxy() / 4, xmin + getmaxx() / 6, -1 * ymax + 3 * getmaxy() / 4);
-    line(xmin + getmaxx() / 6, -1 * ymax + 3 * getmaxy() / 4, xmax + getmaxx() / 6, -1 * ymax + 3 * getmaxy() / 4);
-    line(xmax + getmaxx() / 6, -1 * ymax + 3 * getmaxy() / 4, xmax + getmaxx() / 6, -1 * ymin + 3 * getmaxy() / 4);
-    line(xmax + getmaxx() / 6, -1 * ymin + 3 * getmaxy() / 4, xmin + getmaxx() / 6, -1 * ymin + 3 * getmaxy() / 4);
+    // Drawing the Unlcliped Lines
+    char textBefore[50] = "Before Clipping";
+    outtextxy(getmaxx() / 2 - 75, 5, textBefore);
+    drawClipRectangle();
+    line(0, -1 * 0 + getmaxy(), 100, -1 * 100 + getmaxy());
+    line(-10, -1 * -10 + getmaxy(), 200, -1 * 100 + getmaxy());
+    line(-10, -1 * -10 + getmaxy(), 700, -1 * 350 + getmaxy());
+    line(30, -1 * 50 + getmaxy(), 100, -1 * 451 + getmaxy());
+    line(80, -1 * 80 + getmaxy(), 342, -1 * 243 + getmaxy());
 
+    system("pause");
+    cleardevice();
+
+    // Drawing the Clipped Lines
+    char textAfter[50] = "After Clipping";
+    outtextxy(getmaxx() / 2 - 75, 5, textAfter);
+    drawClipRectangle();
     CohenSutherlandLineClipAndDraw(0, 0, 100, 100);
     CohenSutherlandLineClipAndDraw(-10, -10, 200, 100);
-    CohenSutherlandLineClipAndDraw(-10, -10, 450, 350);
-    CohenSutherlandLineClipAndDraw(30, 50, 100, 351);
+    CohenSutherlandLineClipAndDraw(-10, -10, 700, 350);
+    CohenSutherlandLineClipAndDraw(30, 50, 100, 451);
+    CohenSutherlandLineClipAndDraw(80, 80, 342, 243);
 
     getch();
     closegraph();

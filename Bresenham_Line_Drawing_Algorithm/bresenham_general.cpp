@@ -115,8 +115,8 @@ void bresenham(int x0, int y0, int x1, int y1, int color)
     // Steep Positive
     else if (slope > 1)
     {
-        int d = dy + 2 * dx;        // Initial Value of d
-        int incrN = 2 * dy;         // Increment used for move to E
+        int d = dy - 2 * dx;        // Initial Value of d
+        int incrN = -2 * dx;        // Increment used for move to E
         int incrNE = 2 * (dy - dx); // Increment used for move to SE
         int x = x0;
         int y = y0;
@@ -163,6 +163,8 @@ int main()
     bresenham(50, 50, 50, 450, 8);
     bresenham(0, 0, 40, -40, 9);
     bresenham(50, 80, 90, 110, 10);
+
+    // bresenham(0, 0, 4, -8, 1);
 
     getch();
     closegraph();
