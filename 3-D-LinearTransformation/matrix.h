@@ -92,7 +92,7 @@ public:
     Matrix transpose();
 };
 
-// Initialzing the Static Varibale to store Pointers to Temporary Matrices
+// Initializing  the Static Variable to store Pointers to Temporary Matrices
 int Matrix::created = 0;
 int Matrix::deleted = 0;
 
@@ -171,9 +171,8 @@ Matrix getShearingMatrix(float X1, float X2, float Y1, float Y2, float Z1, float
     shearingMatrix.m[2][1] = Y2;
 
     shearingMatrix.m[0][2] = Z1;
-    shearingMatrix.m[1][2] = Y2;
+    shearingMatrix.m[1][2] = Z2;
 
-    shearingMatrix.display();
     return shearingMatrix;
 }
 // REFLECTION MATRICES
@@ -196,7 +195,7 @@ Matrix getReflectionMatrixAboutXZPlane()
     return reflectionMatrix;
 }
 // ROTATION MATRICES
-// COOUNTER-CLOCKWISE
+// COUNTER-CLOCKWISE
 Matrix getRotationMatrixCounterClockwiseX(float theta)
 {
     Matrix rotationMatrix(4, 4);
@@ -245,8 +244,8 @@ Matrix getProjectionZ()
     return projectionZ;
 }
 
-// PRESPECTIVE PROJECTION
-Matrix getPrespectiveProjMatrix(float p, float q, float r)
+// PERSPECTIVE  PROJECTION
+Matrix getPerspectiveProjMatrix(float p, float q, float r)
 {
     Matrix prespectiveMatrix(4, 4);
     prespectiveMatrix.m[0][3] = p;

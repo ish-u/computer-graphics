@@ -1,14 +1,16 @@
 #include <graphics.h>
 #include <graphics.h>
 #include <math.h>
+#include <stdlib.h>
 
 using namespace std;
 #include "matrix.h"
 
+char fileName[100] = "";
 // CONSTANTS
 const double PI = 4 * atanf(1);
-const float THETA = 0 * (PI / 180);
-const float PHI = 0 * (PI / 180);
+const float THETA = 15 * (PI / 180);
+const float PHI = 30 * (PI / 180);
 
 void sortCoOrdinates(int *poly, int numberOfCoOrdinates)
 {
@@ -218,6 +220,9 @@ void HermiteCurve::display()
         line((requiredMatrix.m[i - 1][0]) + getmaxx() / 2, -1 * requiredMatrix.m[i - 1][1] + getmaxy() / 2, (requiredMatrix.m[i][0]) + getmaxx() / 2, -1 * requiredMatrix.m[i][1] + getmaxy() / 2);
     }
     setcolor(3);
+    // Save Image
+    sprintf(fileName, "Hermite_Curve_%d.bmp", (int)(rand() % 1000) + 1);
+    writeimagefile(fileName);
 }
 // =========================================
 
@@ -235,28 +240,10 @@ public:
     {
         this->n = n;
         this->geometricMatrix = new Matrix(4, 4, 0);
-        // this->geometricMatrix->input();
-        this->geometricMatrix->m[0][0] = 50;
-        this->geometricMatrix->m[0][1] = 100;
-        this->geometricMatrix->m[0][2] = 0;
         this->geometricMatrix->m[0][3] = 1;
-
-        this->geometricMatrix->m[1][0] = -50;
-        this->geometricMatrix->m[1][1] = -100;
-        this->geometricMatrix->m[1][2] = 0;
         this->geometricMatrix->m[1][3] = 1;
-
-        this->geometricMatrix->m[2][0] = 200;
-        this->geometricMatrix->m[2][1] = 200;
-        this->geometricMatrix->m[2][2] = 0;
         this->geometricMatrix->m[2][3] = 1;
-
-        this->geometricMatrix->m[3][0] = 200;
-        this->geometricMatrix->m[3][1] = 200;
-        this->geometricMatrix->m[3][2] = 0;
         this->geometricMatrix->m[3][3] = 1;
-
-        this->geometricMatrix->display();
     }
     // Destructor
     ~BezierCurve()
@@ -271,7 +258,7 @@ public:
 
 void BezierCurve ::input()
 {
-    cout << "Enter the Hermite Geometric Matrix rowise : \n";
+    cout << "Enter the Bezier Geometric Matrix rowise : \n";
     for (int i = 0; i < 4; i++)
     {
         cout << "Row " << i << " : ";
@@ -365,8 +352,10 @@ void BezierCurve::display()
     // drawing the Convex Hull
     drawpoly(convexHull.r + 1, poly);
     delete[] poly;
-
     setcolor(15);
+    // Save Image
+    sprintf(fileName, "Bezier_Curve_%d.bmp", (int)(rand() % 1000) + 1);
+    writeimagefile(fileName);
 }
 
 // =========================================

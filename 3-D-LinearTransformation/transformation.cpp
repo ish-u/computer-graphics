@@ -2,22 +2,21 @@
 #include <graphics.h>
 #include <math.h>
 
-        // delta *= PI / 180;
 using namespace std;
-#include "shape.h"
+#include "threeDimObject.h"
 
 int main()
 {
     int gd = DETECT, gm;
     // initgraph(&gd, &gm, NULL);
-    initwindow(800, 800);
+    initwindow(1000, 600);
 
     // cout << "Enter the Number of Co-ordinates : ";
     // int coOrdinates = 0;
     // cin >> coOrdinates;
-    // Shape *shape = new Shape(coOrdinates);
+    // ThreeDimObject *object = new ThreeDimObject(coOrdinates);
     // Default Constructor that draws a Cube with one cutted corner
-    Shape *shape = new Shape();
+    ThreeDimObject *object = new ThreeDimObject();
 
     // Menu
     int flag = 1;
@@ -36,7 +35,7 @@ int main()
              << "8. Orthographic Projection Demonstration\n"
              << "9. Axonometric Projection Demonstration\n"
              << "10. Oblique Projection Demonstration\n"
-             << "11. Prespective Projection Demonstration\n"
+             << "11. Perspective Projection Demonstration\n"
              << "12. Exit\n"
              << " : ";
         cin >> option;
@@ -44,37 +43,37 @@ int main()
         switch (option)
         {
         case 1:
-            shape->scaling();
+            object->scaling();
             break;
         case 2:
-            shape->shearing();
+            object->shearing();
             break;
         case 3:
-            shape->reflection();
+            object->reflection();
             break;
         case 4:
-            shape->rotation();
+            object->rotation();
             break;
         case 5:
-            shape->translation();
+            object->translation();
             break;
         case 6:
-            shape->transformationMatrix();
+            object->transformationMatrix();
             break;
         case 7:
-            shape->animation();
+            object->animation();
             break;
         case 8:
-            shape->orthographicProjectionDemo();
+            object->orthographicProjectionDemo();
             break;
         case 9:
-            shape->axonometricProjectionDemo();
+            object->axonometricProjectionDemo();
             break;
         case 10:
-            shape->obliqueProjectionDemo();
+            object->obliqueProjectionDemo();
             break;
         case 11:
-            shape->prespectiveProjectionDemo();
+            object->perspectiveProjectionDemo();
             break;
         case 12:
             flag = 0;
@@ -93,7 +92,7 @@ int main()
     // getch();
     closegraph();
 
-    delete shape;
+    delete object;
     cout << Matrix::deleted << "\t" << Matrix::created << "\n";
     return 0;
 }

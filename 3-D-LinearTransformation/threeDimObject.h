@@ -3,12 +3,13 @@
 #include <graphics.h>
 #include "matrix.h"
 using namespace std;
+char fileName[100] = "";
 
 const float THETA = 15 * (3.14159265359 / 180);
 const float PHI = 30 * (3.14159265359 / 180);
 const float PI = 4 * atanf(1);
 
-// Helper Functions for the Shape Class
+// Helper Functions for the ThreeDimObject Class
 // Draw a Line with Axonometric Projection
 void drawLine(Matrix Line, int color = 15, float theta = THETA, float phi = PHI)
 {
@@ -81,7 +82,7 @@ void drawAxisOblique(float alpha, float beta)
     delete Lines;
 }
 
-// Drawing Co-Ordinate Axis with Prespective Projection
+// Drawing Co-Ordinate Axis with Perspective Projection
 void drawAxisPrespective(float p, float q, float r)
 {
     // To Draw the Co-Ordinate Axis
@@ -112,8 +113,8 @@ void drawAxisPrespective(float p, float q, float r)
 
     // Obtaining the Axis with the necessary rotations
     Matrix pZ = getProjectionZ();
-    Matrix prespective = getPrespectiveProjMatrix(p, q, r);
-    Matrix requiredMatrix = (*(Lines)) * prespective * pZ;
+    Matrix perspective = getPerspectiveProjMatrix(p, q, r);
+    Matrix requiredMatrix = (*(Lines)) * perspective * pZ;
     Matrix *requiredMatrixPtr = &requiredMatrix;
 
     // requiredMatrix.display();
@@ -201,13 +202,13 @@ void drawAxis(float theta = THETA, float phi = PHI)
     delete Lines;
 }
 
-// Shape Class
-class Shape
+// ThreeDimObject Class
+class ThreeDimObject
 {
 
 public:
-    // Deafult Constructor
-    Shape()
+    // Default Constructor
+    ThreeDimObject()
     {
         // A CUBE WITH A CORNER CUT
         this->numberOfCoOrdinates = 10;
@@ -260,53 +261,56 @@ public:
         }
         // this->coOrdinates->display();
 
-        // WE WILL USE A ADJACENCY MATRIX TO REPRESENT WHETHER ANY TWO VERTICES (CO-ORDNIATES) ARE CONNNECTED OR NOT
+        // WE WILL USE A ADJACENCY MATRIX TO REPRESENT WHETHER ANY TWO VERTICES (CO-ORDNIATES) ARE CONNECTED OR NOT
         // A,B,C, ... ,J --MAPS TO--> 0,1,2, ... ,9
         this->numberOfFaces = 7;
-        this->faces = new Matrix(this->numberOfCoOrdinates, this->numberOfCoOrdinates, 0);
+        this->edges = new Matrix(this->numberOfCoOrdinates, this->numberOfCoOrdinates, 0);
         // A
-        this->faces->m[0][1] = 1;
-        this->faces->m[0][4] = 1;
-        this->faces->m[0][5] = 1;
+        this->edges->m[0][1] = 1;
+        this->edges->m[0][4] = 1;
+        this->edges->m[0][5] = 1;
         // B
-        this->faces->m[1][0] = 1;
-        this->faces->m[1][2] = 1;
-        this->faces->m[1][6] = 1;
+        this->edges->m[1][0] = 1;
+        this->edges->m[1][2] = 1;
+        this->edges->m[1][6] = 1;
         // C
-        this->faces->m[2][3] = 1;
-        this->faces->m[2][1] = 1;
-        this->faces->m[2][9] = 1;
+        this->edges->m[2][3] = 1;
+        this->edges->m[2][1] = 1;
+        this->edges->m[2][9] = 1;
         // D
-        this->faces->m[3][2] = 1;
-        this->faces->m[3][4] = 1;
-        this->faces->m[3][9] = 1;
+        this->edges->m[3][2] = 1;
+        this->edges->m[3][4] = 1;
+        this->edges->m[3][9] = 1;
         // E
-        this->faces->m[4][0] = 1;
-        this->faces->m[4][3] = 1;
-        this->faces->m[4][8] = 1;
+        this->edges->m[4][0] = 1;
+        this->edges->m[4][3] = 1;
+        this->edges->m[4][8] = 1;
         // F
-        this->faces->m[5][0] = 1;
-        this->faces->m[5][6] = 1;
-        this->faces->m[5][8] = 1;
+        this->edges->m[5][0] = 1;
+        this->edges->m[5][6] = 1;
+        this->edges->m[5][8] = 1;
         // G
-        this->faces->m[6][1] = 1;
-        this->faces->m[6][5] = 1;
-        this->faces->m[6][7] = 1;
+        this->edges->m[6][1] = 1;
+        this->edges->m[6][5] = 1;
+        this->edges->m[6][7] = 1;
         // H
-        this->faces->m[7][8] = 1;
-        this->faces->m[7][9] = 1;
-        this->faces->m[7][6] = 1;
+        this->edges->m[7][8] = 1;
+        this->edges->m[7][9] = 1;
+        this->edges->m[7][6] = 1;
         // I
-        this->faces->m[8][4] = 1;
-        this->faces->m[8][5] = 1;
-        this->faces->m[8][7] = 1;
+        this->edges->m[8][4] = 1;
+        this->edges->m[8][5] = 1;
+        this->edges->m[8][7] = 1;
         // J
-        this->faces->m[9][2] = 1;
-        this->faces->m[9][3] = 1;
-        this->faces->m[9][7] = 1;
+        this->edges->m[9][2] = 1;
+        this->edges->m[9][3] = 1;
+        this->edges->m[9][7] = 1;
+
+        char heading[50] = "";
+        drawAxonometricProjection(this->coOrdinates, THETA, PHI, heading);
     }
-    // Overloaded Constructor - to use when want to take input of Co-Ordinates of Object/Shape
-    Shape(int numberOfCoOrdinates)
+    // Overloaded Constructor - to use when want to take input of Co-Ordinates of Object/ThreeDimObject
+    ThreeDimObject(int numberOfCoOrdinates)
     {
         this->numberOfCoOrdinates = numberOfCoOrdinates;
         if (this->numberOfCoOrdinates <= 0)
@@ -325,14 +329,14 @@ public:
                 cin >> this->coOrdinates->m[i][j];
             }
         }
-        // filling last row as 1 for Homogenous Co-Ordinates
+        // filling last row as 1 for Homogeneous Co-Ordinates
         for (int i = 0; i < numberOfCoOrdinates; i++)
         {
             this->coOrdinates->m[i][3] = 1;
         }
 
-        // taking faces matrix input
-        this->faces = new Matrix(numberOfCoOrdinates, numberOfCoOrdinates, 0);
+        // taking edges matrix input
+        this->edges = new Matrix(numberOfCoOrdinates, numberOfCoOrdinates, 0);
 
         for (int i = 0; i < numberOfCoOrdinates; i++)
         {
@@ -341,20 +345,20 @@ public:
                 if (i != j)
                 {
                     cout << "Connected - " << i + 1 << " <-> " << j + 1 << " : ";
-                    cin >> this->faces->m[i][j];
+                    cin >> this->edges->m[i][j];
                 }
             }
         }
 
         // this->coOrdinates->display();
-        // this->faces->display();
+        // this->edges->display();
     }
 
     // Desctructor
-    ~Shape()
+    ~ThreeDimObject()
     {
         delete this->coOrdinates;
-        delete this->faces;
+        delete this->edges;
     }
     // member function
     void scaling();
@@ -367,14 +371,14 @@ public:
     void orthographicProjectionDemo();
     void axonometricProjectionDemo();
     void obliqueProjectionDemo();
-    void prespectiveProjectionDemo();
+    void perspectiveProjectionDemo();
 
 private:
-    // Data Memebers
+    // Data Members
     int numberOfCoOrdinates = 0;
     int numberOfFaces = 0;
     Matrix *coOrdinates;
-    Matrix *faces;
+    Matrix *edges;
     // Member Functions
     void drawShape(Matrix *coOrdinates);
     void convertToHomogenous(Matrix *coOrdinates);
@@ -382,11 +386,11 @@ private:
     void drawOrthographicProjection(Matrix *coOrdinates, float theta, float phi, float ita, char *heading);
     void drawAxonometricProjection(Matrix *coOrdinates, float theta, float phi, char *heading);
     void drawObliqueProjection(Matrix *coOrdinates, float alpha, float beta);
-    void drawPrespectiveProjection(Matrix *coOrdinates, float p, float q, float r, char *heading);
+    void drawPerspectiveProjection(Matrix *coOrdinates, float p, float q, float r, char *heading);
 };
 
-// To Draw the Shape whose Co-Ordinate are in Homogenous Matrix as a "matrix" object
-void Shape::drawShape(Matrix *matrix)
+// To Draw the ThreeDimObject whose Co-Ordinate are in Homogenous Matrix as a "matrix" object
+void ThreeDimObject::drawShape(Matrix *matrix)
 {
     float **coOrdinates = matrix->m;
     int numberOfCoOrdinates = matrix->r;
@@ -402,23 +406,23 @@ void Shape::drawShape(Matrix *matrix)
     // matrix->display();
     // cout << "===================================\n\n";
 
-    // DRAWING ALL THE FACES OF THE 3-D OBJECT
+    // DRAWING THE 3-D OBJECT
     for (int i = 0; i < numberOfCoOrdinates; i++)
     {
         for (int j = 0; j < numberOfCoOrdinates; j++)
         {
-            if (this->faces->m[i][j] == 1)
+            if (this->edges->m[i][j] == 1)
             {
                 // reflect about x-axis
-                // transtale to center of window
+                // translate to center of window
                 line((coOrdinates[i][0]) + getmaxx() / 2, -1 * coOrdinates[i][1] + getmaxy() / 2, (coOrdinates[j][0]) + getmaxx() / 2, -1 * coOrdinates[j][1] + getmaxy() / 2);
             }
         }
     }
 }
 
-// Convert the Co-Ordinates to Homogenous Co-Ordinates of a Matrix Object with h = 1
-void Shape::convertToHomogenous(Matrix *matrix)
+// Convert the Co-Ordinates to Homogeneous Co-Ordinates of a Matrix Object with h = 1
+void ThreeDimObject::convertToHomogenous(Matrix *matrix)
 {
     for (int i = 0; i < matrix->r; i++)
     {
@@ -428,8 +432,8 @@ void Shape::convertToHomogenous(Matrix *matrix)
     }
 }
 
-// Get Centroid of an Object/Shape
-float *Shape ::getCentroid(Matrix *coOrdinates)
+// Get Centroid of an Object/ThreeDimObject
+float *ThreeDimObject ::getCentroid(Matrix *coOrdinates)
 {
     float centroidX = 0;
     float centroidY = 0;
@@ -473,10 +477,10 @@ float *Shape ::getCentroid(Matrix *coOrdinates)
 
 // ORTHOGRAPHIC PROJECTION
 // =============================================================
-void Shape ::drawOrthographicProjection(Matrix *m, float theta, float phi, float ita, char *heading)
+void ThreeDimObject ::drawOrthographicProjection(Matrix *m, float theta, float phi, float ita, char *heading)
 {
     float *centroid = getCentroid(m);
-    // Creating the Rquired Transformation Matrices
+    // Creating the Required Transformation Matrices
     Matrix T = getTranslationMatrix(centroid[0], centroid[1], centroid[2]);
     Matrix T_inv = getTranslationMatrix(-1 * centroid[0], -1 * centroid[1], -1 * centroid[2]);
     Matrix pZ = getProjectionZ();
@@ -486,14 +490,15 @@ void Shape ::drawOrthographicProjection(Matrix *m, float theta, float phi, float
     Matrix scaleMatrix = getScaleMatrix(3, 3, 3);
     outtextxy(20, 20, heading);
 
-    // Finding the Transformed Object/Shape Co-Ordinates
+    // Finding the Transformed Object/ThreeDimObject Co-Ordinates
     Matrix face = (*(m)) * T * rotateX * rotateY * rotateZ * scaleMatrix * pZ;
     Matrix *requiredMatrixPtr = &face;
     this->drawShape(requiredMatrixPtr);
 }
 
-void Shape::orthographicProjectionDemo()
+void ThreeDimObject::orthographicProjectionDemo()
 {
+    cleardevice();
     char text[50 + sizeof(char)];
     float theta = 0;
     float phi = 0;
@@ -503,6 +508,8 @@ void Shape::orthographicProjectionDemo()
     sprintf(text, "Orthographic -> FRONT");
     drawOrthographicProjection(this->coOrdinates, theta, phi, ita, text);
     delay(1000);
+    // sprintf(fileName, "Orthographics_FRONT.bmp");
+    // writeimagefile(fileName);
     cleardevice();
 
     // RIGHT
@@ -511,6 +518,8 @@ void Shape::orthographicProjectionDemo()
     phi = -90 * (PI / 180);
     drawOrthographicProjection(this->coOrdinates, theta, phi, ita, text);
     delay(1000);
+    // sprintf(fileName, "Orthographics_RIGHT.bmp");
+    // writeimagefile(fileName);
     cleardevice();
 
     // TOP
@@ -519,6 +528,8 @@ void Shape::orthographicProjectionDemo()
     theta = 90 * (PI / 180);
     drawOrthographicProjection(this->coOrdinates, theta, phi, ita, text);
     delay(1000);
+    // sprintf(fileName, "Orthographics_TOP.bmp");
+    // writeimagefile(fileName);
     cleardevice();
 
     // BOTTOM
@@ -527,6 +538,8 @@ void Shape::orthographicProjectionDemo()
     theta = -90 * (PI / 180);
     drawOrthographicProjection(this->coOrdinates, theta, phi, ita, text);
     delay(1000);
+    // sprintf(fileName, "Orthographics_BOTTOM.bmp");
+    // writeimagefile(fileName);
     cleardevice();
 
     // REAR
@@ -535,6 +548,8 @@ void Shape::orthographicProjectionDemo()
     phi = 180 * (PI / 180);
     drawOrthographicProjection(this->coOrdinates, theta, phi, ita, text);
     delay(1000);
+    // sprintf(fileName, "Orthographics_REAR.bmp");
+    // writeimagefile(fileName);
     cleardevice();
 
     // LEFT
@@ -543,13 +558,15 @@ void Shape::orthographicProjectionDemo()
     phi = 90 * (PI / 180);
     drawOrthographicProjection(this->coOrdinates, theta, phi, ita, text);
     delay(1000);
+    // sprintf(fileName, "Orthographics_LEFT.bmp");
+    // writeimagefile(fileName);
     cleardevice();
 }
 // =============================================================
 
 // AXONOMETRIC PROJECTION
 // =============================================================
-void Shape::drawAxonometricProjection(Matrix *m, float theta, float phi, char *heading)
+void ThreeDimObject::drawAxonometricProjection(Matrix *m, float theta, float phi, char *heading)
 {
     float *centroid = getCentroid(m);
     char text[50 + sizeof(char)];
@@ -568,7 +585,7 @@ void Shape::drawAxonometricProjection(Matrix *m, float theta, float phi, char *h
     this->drawShape(requiredMatrixPtr);
     drawAxis(theta, phi);
 
-    // calculating forsshortening ratios
+    // calculating foreshortening  ratios
     Matrix U(3, 4, 1);
     for (int i = 0; i < 3; i++)
     {
@@ -586,15 +603,17 @@ void Shape::drawAxonometricProjection(Matrix *m, float theta, float phi, char *h
     outtextxy(20, 120, text);
 }
 
-void Shape::axonometricProjectionDemo()
+void ThreeDimObject::axonometricProjectionDemo()
 {
     char text[50 + sizeof(char)];
     float theta = 0;
     float phi = 0;
 
+    cleardevice();
+
     // TRIMETRIC
     // TAKING THE EXAMPLE OF ROTAION IN y-axis FOLLOWED BY x-axis
-    sprintf(text, "Axonometric -> Trimetric");
+    sprintf(text, "Axonometric Projection -> Trimetric");
     for (int i = 0; i <= 90; i += 15)
     {
         for (int j = 15; j <= 45; j += 15)
@@ -604,6 +623,8 @@ void Shape::axonometricProjectionDemo()
             phi = j * (PI / 180);
             drawAxonometricProjection(this->coOrdinates, theta, phi, text);
             delay(1000);
+            // sprintf(fileName, "Axonometric_Trimetric_%d_%d.bmp", i, j);
+            // writeimagefile(fileName);
             // system("pause");
             cleardevice();
         }
@@ -614,19 +635,21 @@ void Shape::axonometricProjectionDemo()
         float fz = 0;
         for (int i = 0; i < 9; i++)
         {
-            sprintf(text, "Axonometric -> Dimetric");
+            sprintf(text, "Axonometric Projection -> Dimetric");
             fz = 0.125 * i;
             theta = asin(fz / sqrt(2));
             phi = asin(fz / sqrt(2 - powf(fz, 2)));
             drawAxonometricProjection(this->coOrdinates, theta, phi, text);
             delay(1000);
+            // sprintf(fileName, "Axonometric_Dimetric_%d_%d.bmp", i);
+            // writeimagefile(fileName);
             // system("pause");
             cleardevice();
         }
     }
     // ISOMETRIC
     {
-        sprintf(text, "Axonometric -> Isometric");
+        sprintf(text, "Axonometric Projection -> Isometric");
 
         // (35.26, -45)
         theta = 35.26 * (PI / 180);
@@ -634,6 +657,8 @@ void Shape::axonometricProjectionDemo()
         drawAxonometricProjection(this->coOrdinates, theta, phi, text);
         delay(1000);
         // system("pause");
+        // sprintf(fileName, "Axonometric_Isometric_%d_%d.bmp", (int)(theta * (180 / PI)), (int)(phi * (180 / PI)));
+        // writeimagefile(fileName);
         cleardevice();
 
         // (-35.26, -45)
@@ -641,6 +666,8 @@ void Shape::axonometricProjectionDemo()
         phi = -45 * (PI / 180);
         drawAxonometricProjection(this->coOrdinates, theta, phi, text);
         delay(1000);
+        // sprintf(fileName, "Axonometric_Isometric_%d_%d.bmp", (int)(theta * (180 / PI)), (int)(phi * (180 / PI)));
+        // writeimagefile(fileName);
         // system("pause");
         cleardevice();
 
@@ -649,6 +676,8 @@ void Shape::axonometricProjectionDemo()
         phi = 45 * (PI / 180);
         drawAxonometricProjection(this->coOrdinates, theta, phi, text);
         delay(1000);
+        // sprintf(fileName, "Axonometric_Isometric_%d_%d.bmp", (int)(theta * (180 / PI)), (int)(phi * (180 / PI)));
+        // writeimagefile(fileName);
         // system("pause");
         cleardevice();
 
@@ -657,6 +686,8 @@ void Shape::axonometricProjectionDemo()
         phi = 45 * (PI / 180);
         drawAxonometricProjection(this->coOrdinates, theta, phi, text);
         delay(1000);
+        // sprintf(fileName, "Axonometric_Isometric_%d_%d.bmp", (int)(theta * (180 / PI)), (int)(phi * (180 / PI)));
+        // writeimagefile(fileName);
         // system("pause");
         cleardevice();
     }
@@ -665,8 +696,9 @@ void Shape::axonometricProjectionDemo()
 
 // OBLIQUE PROJECTION
 // =============================================================
-void Shape ::obliqueProjectionDemo()
+void ThreeDimObject ::obliqueProjectionDemo()
 {
+    cleardevice();
     // Cabinet Projection
     float alpha = -45;
     float beta = 45;
@@ -674,23 +706,27 @@ void Shape ::obliqueProjectionDemo()
     {
         drawObliqueProjection(this->coOrdinates, i * PI / 180, beta * PI / 180);
         delay(1000);
+        // sprintf(fileName, "Oblique_Cabinet_%d.bmp", i);
+        // writeimagefile(fileName);
         // system("pause");
         cleardevice();
     }
 
-    // Caviliier Projection
+    // Cavalier Projection
     alpha = -45;
     beta = 63.435;
     for (int i = alpha; i <= 45; i += 15)
     {
         drawObliqueProjection(this->coOrdinates, i * PI / 180, beta * PI / 180);
         delay(1000);
+        sprintf(fileName, "Oblique_Cavalier_%d.bmp", i);
+        writeimagefile(fileName);
         // system("pause");
         cleardevice();
     }
 }
 
-void Shape ::drawObliqueProjection(Matrix *coOrdinates, float alpha, float beta)
+void ThreeDimObject ::drawObliqueProjection(Matrix *coOrdinates, float alpha, float beta)
 {
     Matrix pZ = getProjectionZ();
     char text[50 + sizeof(char)];
@@ -713,10 +749,11 @@ void Shape ::drawObliqueProjection(Matrix *coOrdinates, float alpha, float beta)
 }
 // =============================================================
 
-// PRESPECTIVE PROJECTION
+// PERSPECTIVE PROJECTION
 // =============================================================
-void Shape::drawPrespectiveProjection(Matrix *m, float p, float q, float r, char *heading)
+void ThreeDimObject::drawPerspectiveProjection(Matrix *m, float p, float q, float r, char *heading)
 {
+    cleardevice();
     char text[50 + sizeof(char)];
     outtextxy(20, 20, heading);
     sprintf(text, "p : %f \t", p);
@@ -727,15 +764,15 @@ void Shape::drawPrespectiveProjection(Matrix *m, float p, float q, float r, char
     outtextxy(20, 80, text);
 
     Matrix pZ = getProjectionZ();
-    Matrix prespective = getPrespectiveProjMatrix(p, q, r);
-    Matrix requiredMatrix = (*(m)) * prespective * pZ;
+    Matrix perspective = getPerspectiveProjMatrix(p, q, r);
+    Matrix requiredMatrix = (*(m)) * perspective * pZ;
     Matrix *requiredMatrixPtr = &requiredMatrix;
     this->convertToHomogenous(requiredMatrixPtr);
     this->drawShape(requiredMatrixPtr);
     drawAxisPrespective(p, q, r);
 }
 
-void Shape ::prespectiveProjectionDemo()
+void ThreeDimObject ::perspectiveProjectionDemo()
 {
     char text[50 + sizeof(char)];
     float p = 0;
@@ -743,93 +780,107 @@ void Shape ::prespectiveProjectionDemo()
     float r = 0;
 
     // SINGLE POINT
-    sprintf(text, "Prespective -> Single Point");
+    sprintf(text, "Perspective -> Single Point");
     {
-        // z -axis
-        for (int i = 0; i < 10; i++)
+        // z
+        for (int i = 5; i <= 10; i++)
         {
             r = 1 / (100 * (float)i);
-            this->drawPrespectiveProjection(this->coOrdinates, p, q, r, text);
+            this->drawPerspectiveProjection(this->coOrdinates, p, q, r, text);
             delay(1000);
+            // sprintf(fileName, "Single_Point_Z_%d.bmp", 10 - i);
+            // writeimagefile(fileName);
             // system("pause");
             cleardevice();
         }
 
         // y
         p = q = r = 0;
-        for (int i = 0; i < 10; i++)
+        for (int i = 5; i <= 10; i++)
         {
             q = 1 / (100 * (float)i);
-            this->drawPrespectiveProjection(this->coOrdinates, p, q, r, text);
+            this->drawPerspectiveProjection(this->coOrdinates, p, q, r, text);
             delay(1000);
+            // sprintf(fileName, "Single_Point_Y_%d.bmp", 10 - i);
+            // writeimagefile(fileName);
             // system("pause");
             cleardevice();
         }
 
         // x
         p = q = r = 0;
-        for (int i = 0; i < 10; i++)
+        for (int i = 5; i <= 10; i++)
         {
             p = 1 / (100 * (float)i);
-            this->drawPrespectiveProjection(this->coOrdinates, p, q, r, text);
+            this->drawPerspectiveProjection(this->coOrdinates, p, q, r, text);
             delay(1000);
+            // sprintf(fileName, "Single_Point_X_%d.bmp", 10 - i);
+            // writeimagefile(fileName);
             // system("pause");
             cleardevice();
         }
     }
 
     // TWO POINT
-    sprintf(text, "Prespective -> Two Point");
+    sprintf(text, "Perspective -> Two Point");
     {
         // xy
         p = q = r = 0;
-        for (int i = 0; i < 10; i++)
+        for (int i = 5; i <= 10; i++)
         {
             p = 1 / (100 * (float)i);
             q = 1 / (100 * (float)i);
-            this->drawPrespectiveProjection(this->coOrdinates, p, q, r, text);
+            this->drawPerspectiveProjection(this->coOrdinates, p, q, r, text);
             delay(1000);
+            // sprintf(fileName, "Two_Point_XY_%d.bmp", 10 - i);
+            // writeimagefile(fileName);
             // system("pause");
             cleardevice();
         }
 
         // xz
         p = q = r = 0;
-        for (int i = 0; i < 10; i++)
+        for (int i = 5; i <= 10; i++)
         {
             p = 1 / (100 * (float)i);
             r = 1 / (100 * (float)i);
-            this->drawPrespectiveProjection(this->coOrdinates, p, q, r, text);
+            this->drawPerspectiveProjection(this->coOrdinates, p, q, r, text);
             delay(1000);
+            // sprintf(fileName, "Two_Point_XZ_%d.bmp", 10 - i);
+            // writeimagefile(fileName);
             // system("pause");
             cleardevice();
         }
 
         // yz
         p = q = r = 0;
-        for (int i = 0; i < 10; i++)
+        for (int i = 5; i <= 10; i++)
         {
             q = 1 / (100 * (float)i);
             r = 1 / (100 * (float)i);
-            this->drawPrespectiveProjection(this->coOrdinates, p, q, r, text);
+            this->drawPerspectiveProjection(this->coOrdinates, p, q, r, text);
             delay(1000);
+            // sprintf(fileName, "Two_Point_YZ_%d.bmp", 10 - i);
+            // writeimagefile(fileName);
             // system("pause");
             cleardevice();
         }
     }
 
     // THREE POINT
-    sprintf(text, "Prespective -> Three Point");
+    sprintf(text, "Perspective -> Three Point");
     {
         p = q = r = 0;
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 5; i <= 10; i++)
         {
             p = 1 / (100 * (float)i);
             q = 1 / (100 * (float)i);
             r = 1 / (100 * (float)i);
-            this->drawPrespectiveProjection(this->coOrdinates, p, q, r, text);
+            this->drawPerspectiveProjection(this->coOrdinates, p, q, r, text);
             delay(1000);
+            // sprintf(fileName, "Three_Point_XYZ_%d.bmp", 10 - i);
+            // writeimagefile(fileName);
             // system("pause");
             cleardevice();
         }
@@ -840,7 +891,7 @@ void Shape ::prespectiveProjectionDemo()
 
 // OBJECT ANIMATION
 // =============================================================
-void Shape ::animation()
+void ThreeDimObject ::animation()
 {
     double pi = 4 * atan(1);
     float *centroid = this->getCentroid(this->coOrdinates);
@@ -885,9 +936,9 @@ void Shape ::animation()
 // TRANSFORMATION DEMONSTRATION
 
 // To show Scaling Demonstration
-void Shape::scaling()
+void ThreeDimObject::scaling()
 {
-    char heading[50] = "";
+    char heading[200] = "";
     drawAxis();
     cout << "SCALING\n"
          << "1. Uniform Scaling \n"
@@ -936,7 +987,7 @@ void Shape::scaling()
 }
 
 // To show Shearing Demonstration
-void Shape ::shearing()
+void ThreeDimObject ::shearing()
 {
     float theta = 15 * (PI / 180);
     float phi = 30 * (PI / 180);
@@ -948,12 +999,12 @@ void Shape ::shearing()
          << "3. about z-direction \n"
          << "4. general shearing matrix \n"
          << "Enter Option : ";
-    float shearingX1 = 1;
-    float shearingX2 = 1;
-    float shearingY1 = 1;
-    float shearingY2 = 1;
-    float shearingZ1 = 1;
-    float shearingZ2 = 1;
+    float shearingX1 = 0;
+    float shearingX2 = 0;
+    float shearingY1 = 0;
+    float shearingY2 = 0;
+    float shearingZ1 = 0;
+    float shearingZ2 = 0;
     int option;
     cin >> option;
     switch (option)
@@ -984,6 +1035,7 @@ void Shape ::shearing()
         cout << "Z2 : ";
         cin >> shearingZ2;
     }
+    break;
     case 4:
     {
         cout << "Enter Shearing Factor : \n";
@@ -1013,7 +1065,7 @@ void Shape ::shearing()
     }
 
     // Drawing the Figure
-    for (int i = 15; i <= 90; i += 15)
+    for (int i = 15; i <= 60; i += 15)
     {
         for (int j = 30; j <= 45; j += 15)
         {
@@ -1024,9 +1076,10 @@ void Shape ::shearing()
             Matrix requiredMatrix = (*(this->coOrdinates)) * (shearingMatrix);
             Matrix *requiredMatrixPtr = &requiredMatrix;
             this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
-            requiredMatrix.display();
             this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
-            system("pause");
+            // sprintf(fileName, "Shearing_%d_%d.bmp", i, j);
+            // writeimagefile(fileName);
+            // system("pause");
             cleardevice();
             requiredMatrixPtr = NULL;
         }
@@ -1034,7 +1087,7 @@ void Shape ::shearing()
 }
 
 // To show Reflection Demonstration
-void Shape ::reflection()
+void ThreeDimObject ::reflection()
 {
     Matrix pZ = getProjectionZ();
     float theta = 15 * (PI / 180);
@@ -1045,7 +1098,7 @@ void Shape ::reflection()
          << "1. about xy-plane \n"
          << "2. about yz-plane \n"
          << "3. about xz-plane \n"
-         << "4. about arbitary plane \n"
+         << "4. about arbitrary plane \n"
          << "Enter Option : ";
     int option;
     cin >> option;
@@ -1068,7 +1121,9 @@ void Shape ::reflection()
                 Matrix *requiredMatrixPtr = &requiredMatrix;
                 this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
                 this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
-                system("pause");
+                // sprintf(fileName, "Reflection_XY_%d_%d.bmp", i, j);
+                // writeimagefile(fileName);
+                // system("pause");
                 cleardevice();
                 requiredMatrixPtr = NULL;
             }
@@ -1092,7 +1147,9 @@ void Shape ::reflection()
                 Matrix *requiredMatrixPtr = &requiredMatrix;
                 this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
                 this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
-                system("pause");
+                // sprintf(fileName, "Reflection_YZ_%d_%d.bmp", i, j);
+                // writeimagefile(fileName);
+                // system("pause");
                 cleardevice();
                 requiredMatrixPtr = NULL;
             }
@@ -1116,7 +1173,9 @@ void Shape ::reflection()
                 Matrix *requiredMatrixPtr = &requiredMatrix;
                 this->drawAxonometricProjection(this->coOrdinates, theta, phi, heading);
                 this->drawAxonometricProjection(requiredMatrixPtr, theta, phi, heading);
-                system("pause");
+                // sprintf(fileName, "Reflection_XZ_%d_%d.bmp", i, j);
+                // writeimagefile(fileName);
+                // system("pause");
                 cleardevice();
                 requiredMatrixPtr = NULL;
             }
@@ -1193,6 +1252,8 @@ void Shape ::reflection()
         //  Drawing the Original and Transformed Object
         this->drawAxonometricProjection(this->coOrdinates, THETA, PHI, heading);
         this->drawAxonometricProjection(requiredMatrixPtr, THETA, PHI, heading);
+        // sprintf(fileName, "Reflection_Arbitary.bmp");
+        // writeimagefile(fileName);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -1205,7 +1266,7 @@ void Shape ::reflection()
 }
 
 // To show Rotation Demonstration
-void Shape ::rotation()
+void ThreeDimObject ::rotation()
 {
     Matrix pZ = getProjectionZ();
     char heading[50] = "";
@@ -1233,6 +1294,8 @@ void Shape ::rotation()
         this->drawAxonometricProjection(this->coOrdinates, THETA, PHI, heading);
         sprintf(heading, "X-Axis by : %d", (int)(ita * 180 / PI));
         this->drawAxonometricProjection(requiredMatrixPtr, THETA, PHI, heading);
+        // sprintf(fileName, "Rotation_X_%d_.bmp", (int)(ita * 180 / PI));
+        // writeimagefile(fileName);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -1248,6 +1311,8 @@ void Shape ::rotation()
         this->drawAxonometricProjection(this->coOrdinates, THETA, PHI, heading);
         sprintf(heading, "Y-Axis by : %d", (int)(ita * 180 / PI));
         this->drawAxonometricProjection(requiredMatrixPtr, THETA, PHI, heading);
+        // sprintf(fileName, "Rotation_Y_%d_.bmp", (int)(ita * 180 / PI));
+        // writeimagefile(fileName);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -1263,13 +1328,15 @@ void Shape ::rotation()
         this->drawAxonometricProjection(this->coOrdinates, THETA, PHI, heading);
         sprintf(heading, "Z-Axis by : %d", (int)(ita * 180 / PI));
         this->drawAxonometricProjection(requiredMatrixPtr, THETA, PHI, heading);
+        // sprintf(fileName, "Rotation_Z_%d_.bmp", (int)(ita * 180 / PI));
+        // writeimagefile(fileName);
         requiredMatrixPtr = NULL;
     }
     break;
     case 4:
     {
         // ARBITARY AXIS
-        cout << "Enter the Two Co-Ordinate of the Arbitary Axis : \n";
+        cout << "Enter the Two Co-Ordinate of the Arbitrary Axis : \n";
         Matrix arbitaryAxis(2, 4);
         for (int i = 0; i < 2; i++)
         {
@@ -1290,6 +1357,8 @@ void Shape ::rotation()
         // Drawing the Arbitary Axis Line and Original Object
         drawLine(arbitaryAxis, 2);
         this->drawAxonometricProjection(this->coOrdinates, THETA, PHI, heading);
+        // sprintf(fileName, "Rotation_Arbritary_Before%d_.bmp", ita * 180 / PI);
+        // writeimagefile(fileName);
 
         // Finding the DCs
         arbitaryAxis.m[1][0] -= arbitaryAxis.m[0][0];
@@ -1309,10 +1378,10 @@ void Shape ::rotation()
         float alpha = acos(cx / d);
         float beta = acos(d);
         cout << "Direction Cosines : " << cx << "\t" << cy << "\t" << cz << "\n";
-        // cout << "Angle of Rotation to Coincide Arbitary Axis with z-axis : " << alpha << "\t" << beta << "\n";
-        cout << "Angle of Rotation to Coincide Arbitary Axis with z-axis : " << alpha * (180 / PI) << "\t" << beta * (180 / PI) << "\n";
+        // cout << "Angle of Rotation to Coincide Arbitrary Axis with z-axis : " << alpha << "\t" << beta << "\n";
+        cout << "Angle of Rotation to Coincide Arbitrary Axis with z-axis : " << alpha * (180 / PI) << "\t" << beta * (180 / PI) << "\n";
 
-        // Angle of Rotation by the Arbitary Axis
+        // Angle of Rotation by the Arbitrary  Axis
         float delta = 1;
         cout << "Enter the angle of Rotation : ";
         cin >> delta;
@@ -1336,6 +1405,8 @@ void Shape ::rotation()
         drawLine(arbitaryAxis, 2);
         sprintf(heading, "Rotation about Arbitary Axis by : %d", (int)(delta * 180 / PI));
         this->drawAxonometricProjection(requiredMatrixPtr, THETA, PHI, heading);
+        // sprintf(fileName, "Rotation_Arbritary_After%d_.bmp", ita * 180 / PI);
+        // writeimagefile(fileName);
         requiredMatrixPtr = NULL;
         delay(100);
     }
@@ -1349,10 +1420,10 @@ void Shape ::rotation()
 }
 
 // To show Translation Demonstration
-void Shape::translation()
+void ThreeDimObject::translation()
 {
     Matrix pZ = getProjectionZ();
-    char heading[100] = "TRRANSLATION ";
+    char heading[100] = "TRANSLATION ";
 
     cout << "TRANSLATION \n";
     float xFactor = 0;
@@ -1370,11 +1441,13 @@ void Shape::translation()
     this->drawAxonometricProjection(this->coOrdinates, THETA, PHI, heading);
     sprintf(heading, "TRANSLATION BY x: %f, y: %f, z: %f", -1 * xFactor, -1 * yFactor, -1 * zFactor);
     this->drawAxonometricProjection(requiredMatrixPtr, THETA, PHI, heading);
+    // sprintf(fileName, "Translation_%d_%d_%d.bmp", (int)xFactor, (int)yFactor, (int)zFactor);
+    // writeimagefile(fileName);
     requiredMatrixPtr = NULL;
 }
-
+#include <stdlib.h>
 // To show General Transformation Demonstration
-void Shape ::transformationMatrix()
+void ThreeDimObject ::transformationMatrix()
 {
     Matrix transformationMat(4, 4);
     Matrix pZ = getProjectionZ();
@@ -1393,5 +1466,7 @@ void Shape ::transformationMatrix()
     Matrix *requiredMatrixPtr = &requiredMatrix;
     this->drawAxonometricProjection(this->coOrdinates, THETA, PHI, heading);
     this->drawAxonometricProjection(requiredMatrixPtr, THETA, PHI, heading);
+    // sprintf(fileName, "General_Transformation_%d.bmp", (rand() % 1000 + 1) * 10);
+    // writeimagefile(fileName);
     requiredMatrixPtr = NULL;
 }

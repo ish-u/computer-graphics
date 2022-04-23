@@ -1,20 +1,20 @@
 #include <iostream>
 #include <graphics.h>
 using namespace std;
-#include "shape.h"
+#include "twoDimObject.h"
 
 int main()
 {
     int gd = DETECT, gm;
     initgraph(&gd, &gm, NULL);
 
-    // Polygon
+    // 2D Object
     cout << "Enter the Number of Co-ordinates : ";
     int coOrdinates = 0;
     cin >> coOrdinates;
-    Shape *shape = new Shape(coOrdinates);
-    // Deafult Constructor that draws a Quadrilateral
-    // Shape *shape = new Shape();
+    TwoDimObject *object = new TwoDimObject(coOrdinates);
+    // Default Constructor that draws a Quadrilateral
+    // TwoDimObject *object = new TwoDimObject();
 
     // Menu
     int flag = 1;
@@ -25,8 +25,8 @@ int main()
         // Grid Lines
         line(0, getmaxy() / 2, getmaxx(), getmaxy() / 2);
         line(getmaxx() / 2, 0, getmaxx() / 2, getmaxy());
-        // Drawing the Shape
-        shape->drawShape((shape->coOrdinates));
+        // Drawing the 2D Object
+        object->drawObject((object->coOrdinates));
 
         setcolor(12);
         cout << "Choose Option\n"
@@ -43,29 +43,29 @@ int main()
         switch (option)
         {
         case 1:
-            shape->scaling();
+            object->scaling();
             break;
         case 2:
-            shape->shearing();
+            object->shearing();
             break;
         case 3:
-            shape->reflection();
+            object->reflection();
             break;
         case 4:
-            shape->rotation();
+            object->rotation();
             break;
         case 5:
-            shape->translation();
+            object->translation();
             break;
         case 6:
-            shape->transformationMatrix();
+            object->transformationMatrix();
             break;
         case 7:
             flag = 0;
             cout << "EXITING\n";
             break;
         default:
-            cout << " INVALID\n";
+            cout << "INVALID\n";
             break;
         }
         system("pause");
@@ -75,7 +75,7 @@ int main()
 
     closegraph();
 
-    delete shape;
+    delete object;
     cout << "Deleting Temporary Matrices : "
          << Matrix::tempMatrices.size() << "\n";
     for (auto i = Matrix::tempMatrices.begin(); i != Matrix::tempMatrices.end(); i++)

@@ -2,7 +2,7 @@
 #include <graphics.h>
 using namespace std;
 
-const double xmin = 50;
+const double xmin = 40;
 const double xmax = 600;
 const double ymin = 50;
 const double ymax = 430;
@@ -148,10 +148,11 @@ int main()
     outtextxy(getmaxx() / 2 - 75, 5, textBefore);
     drawClipRectangle();
     line(0, -1 * 0 + getmaxy(), 100, -1 * 100 + getmaxy());
-    line(-10, -1 * -10 + getmaxy(), 200, -1 * 100 + getmaxy());
-    line(-10, -1 * -10 + getmaxy(), 700, -1 * 350 + getmaxy());
+    line(-300, -1 * -10 + getmaxy(), 700, -1 * 350 + getmaxy());
     line(30, -1 * 50 + getmaxy(), 100, -1 * 451 + getmaxy());
-    line(80, -1 * 80 + getmaxy(), 342, -1 * 243 + getmaxy());
+    line(150, -1 * 80 + getmaxy(), 342, -1 * 243 + getmaxy());
+    line(450, -1 * -80 + getmaxy(), 450, -1 * 700 + getmaxy());
+    line(620, -1 * -80 + getmaxy(), 630, -1 * 700 + getmaxy());
 
     system("pause");
     cleardevice();
@@ -161,10 +162,11 @@ int main()
     outtextxy(getmaxx() / 2 - 75, 5, textAfter);
     drawClipRectangle();
     CohenSutherlandLineClipAndDraw(0, 0, 100, 100);
-    CohenSutherlandLineClipAndDraw(-10, -10, 200, 100);
-    CohenSutherlandLineClipAndDraw(-10, -10, 700, 350);
+    CohenSutherlandLineClipAndDraw(-300, -10, 700, 350);
     CohenSutherlandLineClipAndDraw(30, 50, 100, 451);
-    CohenSutherlandLineClipAndDraw(80, 80, 342, 243);
+    CohenSutherlandLineClipAndDraw(150, 80, 342, 243);
+    CohenSutherlandLineClipAndDraw(450, -80, 450, 700);
+    CohenSutherlandLineClipAndDraw(650, -80, 650, 700);
 
     getch();
     closegraph();

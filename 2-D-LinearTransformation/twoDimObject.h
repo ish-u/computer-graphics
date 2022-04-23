@@ -235,8 +235,8 @@ Matrix getTranslationMatrix(float xFactor, float yFactor)
     return translationMatrix;
 }
 
-// Shape Class
-class Shape
+// TwoDimObject Class
+class TwoDimObject
 {
 
 public:
@@ -244,7 +244,7 @@ public:
     Matrix *coOrdinates;
     int numberOfCoOrdinates = 0;
     // Constructor
-    Shape()
+    TwoDimObject()
     {
         this->numberOfCoOrdinates = 4;
         this->coOrdinates = new Matrix(4, 3);
@@ -265,7 +265,7 @@ public:
         // this->coOrdinates->display();
     }
     // Overloaded Constructor - to use when want to take input of Co-Ordinates
-    Shape(int numberOfCoOrdinates)
+    TwoDimObject(int numberOfCoOrdinates)
     {
         this->numberOfCoOrdinates = numberOfCoOrdinates;
         this->coOrdinates = new Matrix(numberOfCoOrdinates, 3);
@@ -287,12 +287,12 @@ public:
     }
 
     // Desctructor
-    ~Shape()
+    ~TwoDimObject()
     {
         delete this->coOrdinates;
     }
     // member function
-    void drawShape(Matrix *matrix);
+    void drawObject(Matrix *matrix);
     void scaling();
     void reflection();
     void shearing();
@@ -301,8 +301,8 @@ public:
     void transformationMatrix();
 };
 
-// To Draw the Polygon whose Co-Ordinate are passes as in Homogenous Matrix as a "matrix" object
-void Shape::drawShape(Matrix *matrix)
+// To Draw the 2D Object whose Co-Ordinate are passes as in Homogenous Matrix as a "matrix" object
+void TwoDimObject::drawObject(Matrix *matrix)
 {
     float **coOrdinates = matrix->m;
     int numberOfCoOrdinates = matrix->r;
@@ -338,7 +338,7 @@ void Shape::drawShape(Matrix *matrix)
 }
 
 // To show Scaling Demonstration
-void Shape::scaling()
+void TwoDimObject::scaling()
 {
     cout << "SCALING\n"
          << "1. Uniform Scaling \n"
@@ -374,12 +374,12 @@ void Shape::scaling()
     Matrix scaleMatrix = getScaleMatrix(scaleFactorX, scaleFactorY);
     Matrix requiredMatrix = (*(this->coOrdinates)) * (scaleMatrix);
     Matrix *requiredMatrixPtr = &requiredMatrix;
-    this->drawShape(requiredMatrixPtr);
+    this->drawObject(requiredMatrixPtr);
     requiredMatrixPtr = NULL;
 }
 
 // To show Reflection Demonstration
-void Shape ::reflection()
+void TwoDimObject ::reflection()
 {
     cout << "REFLECTION \n"
          << "1. about x-axis \n"
@@ -398,7 +398,7 @@ void Shape ::reflection()
         Matrix reflectionMatrix = getReflectionMatrixAboutX();
         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        this->drawObject(requiredMatrixPtr);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -407,7 +407,7 @@ void Shape ::reflection()
         Matrix reflectionMatrix = getReflectionMatrixAboutY();
         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        this->drawObject(requiredMatrixPtr);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -416,7 +416,7 @@ void Shape ::reflection()
         Matrix reflectionMatrix = getReflectionMatrixAboutOrigin();
         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        this->drawObject(requiredMatrixPtr);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -425,7 +425,7 @@ void Shape ::reflection()
         Matrix reflectionMatrix = getReflectionMatrixAboutXY();
         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        this->drawObject(requiredMatrixPtr);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -434,7 +434,7 @@ void Shape ::reflection()
         Matrix reflectionMatrix = getReflectionMatrixAboutX_Y();
         Matrix requiredMatrix = (*(this->coOrdinates)) * (reflectionMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        this->drawObject(requiredMatrixPtr);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -467,7 +467,7 @@ void Shape ::reflection()
             Matrix translationMatrix = getTranslationMatrix(C, 0);
             Matrix requiredLineMatrix = (*reflectionLine) * translationMatrix;
             Matrix *requiredLineMatrixPtr = &requiredLineMatrix;
-            this->drawShape(requiredLineMatrixPtr);
+            this->drawObject(requiredLineMatrixPtr);
             requiredLineMatrixPtr = NULL;
             delete reflectionLine;
 
@@ -475,7 +475,7 @@ void Shape ::reflection()
             Matrix reflectionMatrix = getReflectionMatrixAboutY();
             Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix * translationMatrix;
             Matrix *requiredMatrixPtr = &requiredMatrix;
-            this->drawShape(requiredMatrixPtr);
+            this->drawObject(requiredMatrixPtr);
             requiredMatrixPtr = NULL;
         }
         // About y-axis with some translation
@@ -495,7 +495,7 @@ void Shape ::reflection()
             Matrix requiredLineMatrix = (*reflectionLine) * translationMatrix;
             requiredLineMatrix.display();
             Matrix *requiredLineMatrixPtr = &requiredLineMatrix;
-            this->drawShape(requiredLineMatrixPtr);
+            this->drawObject(requiredLineMatrixPtr);
             requiredLineMatrixPtr = NULL;
             delete reflectionLine;
 
@@ -503,7 +503,7 @@ void Shape ::reflection()
             Matrix reflectionMatrix = getReflectionMatrixAboutX();
             Matrix requiredMatrix = (*(this->coOrdinates)) * reflectionMatrix * translationMatrix;
             Matrix *requiredMatrixPtr = &requiredMatrix;
-            this->drawShape(requiredMatrixPtr);
+            this->drawObject(requiredMatrixPtr);
             requiredMatrixPtr = NULL;
         }
         else
@@ -536,7 +536,7 @@ void Shape ::reflection()
             reflectionLine->m[2][1] = y3;
             reflectionLine->m[3][0] = x4;
             reflectionLine->m[3][1] = y4;
-            this->drawShape(reflectionLine);
+            this->drawObject(reflectionLine);
             delete reflectionLine;
 
             // Translate the line to Origin
@@ -553,7 +553,7 @@ void Shape ::reflection()
             Matrix compositionMatrix = translateMat * rotationMatrix * reflectionMatrix * rotationMatrixInverse * translateMatInverse;
             Matrix requiredMatrix = (*(this->coOrdinates)) * (compositionMatrix);
             Matrix *requiredMatrixPtr = &requiredMatrix;
-            this->drawShape(requiredMatrixPtr);
+            this->drawObject(requiredMatrixPtr);
             requiredMatrixPtr = NULL;
         }
     }
@@ -567,7 +567,7 @@ void Shape ::reflection()
 }
 
 // To show Shearing Demonstration
-void Shape ::shearing()
+void TwoDimObject ::shearing()
 {
     cout << "SHEARING \n"
          << "1. about x-component \n"
@@ -587,7 +587,7 @@ void Shape ::shearing()
         Matrix shearingMatrix = getShearingMatrix(shearingX, 0);
         Matrix requiredMatrix = (*(this->coOrdinates)) * (shearingMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        this->drawObject(requiredMatrixPtr);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -598,7 +598,7 @@ void Shape ::shearing()
         Matrix shearingMatrix = getShearingMatrix(0, shearingY);
         Matrix requiredMatrix = (*(this->coOrdinates)) * (shearingMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        this->drawObject(requiredMatrixPtr);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -611,7 +611,7 @@ void Shape ::shearing()
         Matrix shearingMatrix = getShearingMatrix(shearingX, shearingY);
         Matrix requiredMatrix = (*(this->coOrdinates)) * (shearingMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        this->drawObject(requiredMatrixPtr);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -624,7 +624,7 @@ void Shape ::shearing()
 }
 
 // To show Rotation Demonstration
-void Shape ::rotation()
+void TwoDimObject ::rotation()
 {
     cout << "ROTATION \n"
          << "1. Counter Clockwise about Origin \n"
@@ -646,7 +646,7 @@ void Shape ::rotation()
         Matrix rotationMatrix = getRotationMatrixCounterClockwise(theta);
         Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        this->drawObject(requiredMatrixPtr);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -658,7 +658,7 @@ void Shape ::rotation()
         Matrix rotationMatrix = getRotationMatrixClockwise(theta);
         Matrix requiredMatrix = (*(this->coOrdinates)) * (rotationMatrix);
         Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        this->drawObject(requiredMatrixPtr);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -680,7 +680,7 @@ void Shape ::rotation()
         Matrix T_inverse = getTranslationMatrix(-x, -y);
         Matrix requiredMatrix = (*(this->coOrdinates)) * T * R * T_inverse;
         Matrix *requiredMatrixPtr = &requiredMatrix;
-        this->drawShape(requiredMatrixPtr);
+        this->drawObject(requiredMatrixPtr);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -703,7 +703,7 @@ void Shape ::rotation()
         Matrix requiredMatrix = (*(this->coOrdinates)) * T * R * T_inverse;
         Matrix *requiredMatrixPtr = &requiredMatrix;
         cout << requiredMatrixPtr << "\n";
-        this->drawShape(requiredMatrixPtr);
+        this->drawObject(requiredMatrixPtr);
         requiredMatrixPtr = NULL;
     }
     break;
@@ -717,7 +717,7 @@ void Shape ::rotation()
 }
 
 // To show Translation Demonstration
-void Shape::translation()
+void TwoDimObject::translation()
 {
     cout << "TRANSLATION \n";
     float xFactor = 0;
@@ -729,12 +729,12 @@ void Shape::translation()
     Matrix translationMatrix = getTranslationMatrix(xFactor, yFactor);
     Matrix requiredMatrix = (*(this->coOrdinates)) * (translationMatrix);
     Matrix *requiredMatrixPtr = &requiredMatrix;
-    this->drawShape(requiredMatrixPtr);
+    this->drawObject(requiredMatrixPtr);
     requiredMatrixPtr = NULL;
 }
 
 // To show Translation Demonstration
-void Shape ::transformationMatrix()
+void TwoDimObject ::transformationMatrix()
 {
     Matrix transformationMat(3, 3);
     int option = 0;
@@ -775,6 +775,6 @@ void Shape ::transformationMatrix()
     cout << "\n";
     Matrix requiredMatrix = (*(this->coOrdinates)) * (transformationMat);
     Matrix *requiredMatrixPtr = &requiredMatrix;
-    this->drawShape(requiredMatrixPtr);
+    this->drawObject(requiredMatrixPtr);
     requiredMatrixPtr = NULL;
 }
